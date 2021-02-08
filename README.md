@@ -5,4 +5,4 @@ Kotlin Snake OpenGL game.
 
 Design proposals:
 
-[Screen definitions]()
+[Screen definitions](doc/screen_definitions.md)
