@@ -14,5 +14,4 @@ Project structure:
     |
     ├ doc        documents of project
     ├ app        source code
-    └ gradle     graddle staffu 
-    ```
+    └ gradle     graddle staffu ```
