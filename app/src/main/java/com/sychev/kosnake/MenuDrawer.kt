@@ -12,54 +12,54 @@ import android.view.View
 
 class MenuDrawer : View, View.OnTouchListener {
 
-    var fontPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG);
-    var fontSize: Int = 100;
-    var selectionHandler: SelectedItem? = null;
-    var itemList: List<String> = arrayListOf();
-    var vertBorder: Float = 0f;
-    var heightSplit: Float = 0f;
-    var rectList: MutableList<Rect> = mutableListOf();
+    var fontPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    var fontSize: Int = 100
+    var selectionHandler: SelectedItem? = null
+    var itemList: List<String> = arrayListOf()
+    var vertBorder: Float = 0f
+    var heightSplit: Float = 0f
+    var rectList: MutableList<Rect> = mutableListOf()
 
     interface SelectedItem {
-        fun onSelectedItem(item: Int);
+        fun onSelectedItem(item: Int)
     }
 
     constructor(context: Context) : super(context) {
-        fontPaint.textSize = fontSize.toFloat();
-        fontPaint.style = Paint.Style.STROKE;
-        fontPaint.color = Color.GREEN;
-        setOnTouchListener(this);
+        fontPaint.textSize = fontSize.toFloat()
+        fontPaint.style = Paint.Style.STROKE
+        fontPaint.color = Color.GREEN
+        setOnTouchListener(this)
     }
 
     fun setSelectedItemHandler(handler: SelectedItem) {
-        this.selectionHandler = handler;
+        this.selectionHandler = handler
     }
 
     fun setItemArray(array: List<String>) {
-        itemList = array;
-        updateSize();
+        itemList = array
+        updateSize()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
-        updateSize();
+        updateSize()
     }
 
     private fun updateSize() {
-        var h = context.resources.displayMetrics.heightPixels;
-        var w = context.resources.displayMetrics.widthPixels;
-        var count = itemList.count();
-        heightSplit = (h / 20).toFloat();
-        vertBorder = ((h - (count - 1) * heightSplit) / (count + 2)).toFloat();
-        fontPaint.textSize = vertBorder;
+        var h = context.resources.displayMetrics.heightPixels
+        var w = context.resources.displayMetrics.widthPixels
+        var count = itemList.count()
+        heightSplit = (h / 20).toFloat()
+        vertBorder = ((h - (count - 1) * heightSplit) / (count + 2)).toFloat()
+        fontPaint.textSize = vertBorder
         for (i in 0 until itemList.count()) {
-            var y = vertBorder * (i + 1.5f) + i * heightSplit;
+            var y = vertBorder * (i + 1.5f) + i * heightSplit
             var rectangle: Rect = Rect(((w - fontPaint.measureText(itemList[i])) / 2).toInt(),
                 (y - vertBorder).toInt(),
                 ((w + fontPaint.measureText(itemList[i])) / 2).toInt(),
-                y.toInt());
+                y.toInt())
 
-            rectList.add(rectangle);
+            rectList.add(rectangle)
         }
     }
 
@@ -69,15 +69,15 @@ class MenuDrawer : View, View.OnTouchListener {
         if (canvas != null) {
 //            uncomment it background needed
 //            canvas.drawARGB(80, -, 204, 255)
-            canvas.translate(0F, 0F);
+            canvas.translate(0F, 0F)
 
-            var w = context.resources.displayMetrics.widthPixels;
-            var h: Float;
+            var w = context.resources.displayMetrics.widthPixels
+            var h: Float
 
             if (itemList.count() > 0 && rectList.count() > 0)
                 for (i in 0 until itemList.count()) {
                     canvas.drawText(itemList[i], rectList[i].left.toFloat(),
-                        rectList[i].top.toFloat() + vertBorder, fontPaint);
+                        rectList[i].top.toFloat() + vertBorder, fontPaint)
                 }
         }
     }
@@ -89,13 +89,13 @@ class MenuDrawer : View, View.OnTouchListener {
                     if (rectList[i].contains(event.x.toInt(),
                             event.y.toInt()) && selectionHandler != null
                     ) {
-                        Log.d("Menu", "Select " + itemList[i]);
-                        selectionHandler!!.onSelectedItem(i);
+                        Log.d("Menu", "Select " + itemList[i])
+                        selectionHandler!!.onSelectedItem(i)
                         // TODO: add some display change on select item menu
                     }
                 }
             }
         }
-        return true;
+        return true
     }
 }
