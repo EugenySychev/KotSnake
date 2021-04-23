@@ -9,4 +9,18 @@ class SnakeGameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
     }
+
+    override fun onPause() {
+        super.onPause()
+        goToPauseState();
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+    }
+
+    private fun goToPauseState() {
+
+    }
 }

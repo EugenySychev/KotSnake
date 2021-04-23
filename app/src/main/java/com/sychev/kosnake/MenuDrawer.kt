@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
-class MenuDrawer : View, View.OnTouchListener {
+class MenuDrawer(context: Context) : View(context), View.OnTouchListener {
 
     var fontPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var fontSize: Int = 100
@@ -24,7 +24,7 @@ class MenuDrawer : View, View.OnTouchListener {
         fun onSelectedItem(item: Int)
     }
 
-    constructor(context: Context) : super(context) {
+    init {
         fontPaint.textSize = fontSize.toFloat()
         fontPaint.style = Paint.Style.STROKE
         fontPaint.color = Color.GREEN
@@ -46,15 +46,15 @@ class MenuDrawer : View, View.OnTouchListener {
     }
 
     private fun updateSize() {
-        var h = context.resources.displayMetrics.heightPixels
-        var w = context.resources.displayMetrics.widthPixels
-        var count = itemList.count()
+        val h = context.resources.displayMetrics.heightPixels
+        val w = context.resources.displayMetrics.widthPixels
+        val count = itemList.count()
         heightSplit = (h / 20).toFloat()
         vertBorder = ((h - (count - 1) * heightSplit) / (count + 2)).toFloat()
         fontPaint.textSize = vertBorder
         for (i in 0 until itemList.count()) {
-            var y = vertBorder * (i + 1.5f) + i * heightSplit
-            var rectangle: Rect = Rect(((w - fontPaint.measureText(itemList[i])) / 2).toInt(),
+            val y = vertBorder * (i + 1.5f) + i * heightSplit
+            val rectangle: Rect = Rect(((w - fontPaint.measureText(itemList[i])) / 2).toInt(),
                 (y - vertBorder).toInt(),
                 ((w + fontPaint.measureText(itemList[i])) / 2).toInt(),
                 y.toInt())
@@ -70,9 +70,6 @@ class MenuDrawer : View, View.OnTouchListener {
 //            uncomment it background needed
 //            canvas.drawARGB(80, -, 204, 255)
             canvas.translate(0F, 0F)
-
-            var w = context.resources.displayMetrics.widthPixels
-            var h: Float
 
             if (itemList.count() > 0 && rectList.count() > 0)
                 for (i in 0 until itemList.count()) {
