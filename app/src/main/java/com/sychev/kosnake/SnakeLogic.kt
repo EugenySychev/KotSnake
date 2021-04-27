@@ -46,6 +46,9 @@ class SnakeLogic(private final var xMax: Int, private final var yMax: Int, priva
         makeStep()
     }
 
+    fun getX() = xPos
+    fun getY() = yPos
+
     fun makeStep() {
         for (i in length downTo 1) {
             xPos.add(0)
