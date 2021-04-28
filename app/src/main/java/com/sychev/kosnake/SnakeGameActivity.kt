@@ -5,8 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 
 class SnakeGameActivity : AppCompatActivity() {
 
+    private var snakeLogic : SnakeLogic = SnakeLogic(20, 20, 7)
+    private lateinit var view: SnakeDrawer
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        view = SnakeDrawer(this)
+        view.setSnake(snakeLogic)
+        setContentView(view)
 
     }
 

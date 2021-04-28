@@ -1,12 +1,17 @@
 package com.sychev.kosnake
 
+import android.graphics.Point
 import java.lang.Exception
 
-class SnakeLogic(private final var xMax: Int, private final var yMax: Int, private final var length: Int) {
+class SnakeLogic(
+    private final var xMax: Int,
+    private final var yMax: Int,
+    private final var length: Int
+) {
 
-    private var xPos : MutableList<Int> = mutableListOf()
-    private var yPos : MutableList<Int> = mutableListOf()
-    private var snakeHandler : EventHandler? = null
+    private lateinit var applePoint: Point
+    private var snakePos: MutableList<Point> = mutableListOf()
+    private var snakeHandler: EventHandler? = null
 
     private final var direction: MoveDirection = MoveDirection.UP
 
@@ -22,19 +27,17 @@ class SnakeLogic(private final var xMax: Int, private final var yMax: Int, priva
     }
 
     init {
-        if (xMax > length + 2) {
+        if (xMax < length + 2) {
             throw Exception("Very big length of snake, unable to locate it")
         } else {
-            xPos.clear()
-            yPos.clear()
-            xPos.add((xMax - length) / 2)
-            yPos.add(yMax / 2)
+            snakePos.clear()
+            snakePos.add(Point((xMax - length) / 2, yMax / 2))
 
             for (i in 1 until length) {
-                xPos.add(xPos[i - 1] - 1)
-                yPos.add(yPos[i - 1])
+                snakePos.add(Point(snakePos[i - 1].x - 1, snakePos[i - 1].y))
             }
         }
+        applePoint = Point(3,3)
     }
 
     fun eatApple() {
@@ -46,25 +49,34 @@ class SnakeLogic(private final var xMax: Int, private final var yMax: Int, priva
         makeStep()
     }
 
-    fun getX() = xPos
-    fun getY() = yPos
+    fun getSnakePos(index: Int) =
+        if (index < snakePos.count())
+            snakePos[index]
+        else
+            Point(0, 0)
+
 
     fun makeStep() {
-        for (i in length downTo 1) {
-            xPos.add(0)
-            xPos[i + 1] = xPos[i]
-            yPos.add(0)
-            yPos[i + 1] = yPos[i]
+
+        snakePos.add(Point())
+
+        for (i in length downTo 0) {
+            snakePos[i + 1] = snakePos[i]
         }
-        when(direction) {
-            MoveDirection.UP -> yPos[0] = yPos[1] - 1
-            MoveDirection.DOWN -> yPos[0] = yPos[1] + 1
-            MoveDirection.LEFT -> xPos[0] = xPos[1] - 1
-            MoveDirection.RIGHT -> xPos[0] = xPos[1] + 1
+        when (direction) {
+            MoveDirection.UP -> snakePos[0].y -= 1
+            MoveDirection.DOWN -> snakePos[0].y += 1
+            MoveDirection.LEFT -> snakePos[0].x -= 1
+            MoveDirection.RIGHT -> snakePos[0].x += 1
         }
     }
 
     fun getLength(): Int {
         return length
     }
+
+    fun getApplePoint(): Point {
+        return applePoint
+    }
+
 }
