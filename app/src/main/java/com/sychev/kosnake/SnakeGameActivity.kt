@@ -1,6 +1,8 @@
 package com.sychev.kosnake
 
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class SnakeGameActivity : AppCompatActivity() {
@@ -13,7 +15,12 @@ class SnakeGameActivity : AppCompatActivity() {
         view = SnakeDrawer(this)
         view.setSnake(snakeLogic)
         setContentView(view)
-
+        view.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                snakeLogic.makeStep();
+                view.invalidate()
+            }
+        })
     }
 
     override fun onPause() {

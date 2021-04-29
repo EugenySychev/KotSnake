@@ -37,7 +37,7 @@ class SnakeLogic(
                 snakePos.add(Point(snakePos[i - 1].x - 1, snakePos[i - 1].y))
             }
         }
-        applePoint = Point(3,3)
+        applePoint = Point(3, 3)
     }
 
     fun eatApple() {
@@ -58,16 +58,22 @@ class SnakeLogic(
 
     fun makeStep() {
 
-        snakePos.add(Point())
+//        snakePos.add(snakePos.count(), Point())
 
-        for (i in length downTo 0) {
-            snakePos[i + 1] = snakePos[i]
+        for (i in length - 1 downTo 1) {
+            snakePos[i].x = snakePos[i - 1].x
+            snakePos[i].y = snakePos[i - 1].y
         }
         when (direction) {
             MoveDirection.UP -> snakePos[0].y -= 1
             MoveDirection.DOWN -> snakePos[0].y += 1
             MoveDirection.LEFT -> snakePos[0].x -= 1
             MoveDirection.RIGHT -> snakePos[0].x += 1
+        }
+        if (snakePos[0].x > xMax || snakePos[0].x < 0 ||
+            snakePos[0].y > yMax || snakePos[0].y < 0
+        ) {
+            snakeHandler!!.snakeDie()
         }
     }
 

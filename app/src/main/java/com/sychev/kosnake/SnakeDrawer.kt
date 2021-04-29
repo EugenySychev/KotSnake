@@ -50,18 +50,25 @@ class SnakeDrawer(context: Context?) : View(context) {
     }
 
     private fun drawAppleCube(canvas: Canvas?, applePoint: Point) {
-        canvas?.drawRect((applePoint.x * cubeSize).toFloat(),
-            (applePoint.y * cubeSize).toFloat(),
-            ((applePoint.x + 1) * cubeSize).toFloat() - thinkness * 2,
-            ((applePoint.y + 1) * cubeSize).toFloat() - thinkness * 2,
-            applePaint)
+        drawCube(canvas, applePoint, applePaint)
     }
 
     fun drawSnakeCube(canvas: Canvas?, pos: Point) {
+        drawCube(canvas, pos, snakePaint)
+    }
+
+    fun drawCube(canvas: Canvas?, pos: Point, paint: Paint) {
+        paint.style = Paint.Style.STROKE;
         canvas?.drawRect((pos.x * cubeSize).toFloat(),
             (pos.y * cubeSize).toFloat(),
             ((pos.x + 1) * cubeSize).toFloat() - thinkness * 2,
             ((pos.y + 1) * cubeSize).toFloat() - thinkness * 2,
-            snakePaint)
+            paint)
+        paint.style = Paint.Style.FILL
+        canvas?.drawRect((pos.x * cubeSize + thinkness * 2).toFloat(),
+            (pos.y * cubeSize + thinkness * 2).toFloat(),
+            ((pos.x + 1) * cubeSize).toFloat() - thinkness * 4,
+            ((pos.y + 1) * cubeSize).toFloat() - thinkness * 4,
+            paint)
     }
 }
