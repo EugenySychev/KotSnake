@@ -1,6 +1,7 @@
 package com.sychev.kosnake
 
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,32 @@ class SnakeGameActivity : AppCompatActivity() {
                 snakeLogic.makeStep();
                 view.invalidate()
             }
+        })
+
+        view.setOnTouchListener(object : OnSwipeTouchListener(this@SnakeGameActivity) {
+            override fun onSwipeUp() {
+                super.onSwipeUp()
+                snakeLogic.changeDirection(SnakeLogic.MoveDirection.UP)
+                view.invalidate()
+            }
+
+            override fun onSwipeLeft() {
+                super.onSwipeLeft()
+                snakeLogic.changeDirection(SnakeLogic.MoveDirection.LEFT)
+                view.invalidate()
+            }
+
+            override fun onSwipeRight() {
+                super.onSwipeRight()
+                snakeLogic.changeDirection(SnakeLogic.MoveDirection.RIGHT)
+                view.invalidate()
+            }
+            override fun onSwipeDown() {
+                super.onSwipeDown()
+                snakeLogic.changeDirection(SnakeLogic.MoveDirection.DOWN)
+                view.invalidate()
+            }
+
         })
     }
 

@@ -4,16 +4,16 @@ import android.graphics.Point
 import java.lang.Exception
 
 class SnakeLogic(
-    private final var xMax: Int,
-    private final var yMax: Int,
-    private final var length: Int
+    private var xMax: Int,
+    private var yMax: Int,
+    private var length: Int
 ) {
 
-    private lateinit var applePoint: Point
+    private var applePoint: Point
     private var snakePos: MutableList<Point> = mutableListOf()
     private var snakeHandler: EventHandler? = null
 
-    private final var direction: MoveDirection = MoveDirection.UP
+    private var direction: MoveDirection = MoveDirection.UP
 
     enum class MoveDirection {
         UP,
@@ -57,9 +57,6 @@ class SnakeLogic(
 
 
     fun makeStep() {
-
-//        snakePos.add(snakePos.count(), Point())
-
         for (i in length - 1 downTo 1) {
             snakePos[i].x = snakePos[i - 1].x
             snakePos[i].y = snakePos[i - 1].y
