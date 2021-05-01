@@ -9,21 +9,21 @@ import androidx.appcompat.app.AppCompatActivity
 
 class SnakeGameActivity : AppCompatActivity() {
 
-    private var snakeLogic : SnakeLogic = SnakeLogic(20, 20, 7)
+    private lateinit var snakeLogic : SnakeLogic
     private lateinit var view: SnakeDrawer
 
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         view = SnakeDrawer(this)
-        view.setSnake(snakeLogic)
         setContentView(view)
-        view.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                snakeLogic.makeStep();
-                view.invalidate()
-            }
-        })
+
+        snakeLogic = SnakeLogic(view.xMax, view.yMax, 7)
+        view.setSnake(snakeLogic)
+        view.setOnClickListener {
+            snakeLogic.makeStep();
+            view.invalidate()
+        }
 
         view.setOnTouchListener(object : OnSwipeTouchListener(this@SnakeGameActivity) {
             override fun onSwipeUp() {

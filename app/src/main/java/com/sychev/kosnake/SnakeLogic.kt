@@ -13,6 +13,7 @@ class SnakeLogic(
     private lateinit var applePoint : Point
     private var snakePos: MutableList<Point> = mutableListOf()
     private var snakeHandler: EventHandler? = null
+    var score : Int = 0
 
     private var direction: MoveDirection = MoveDirection.UP
 
@@ -78,6 +79,7 @@ class SnakeLogic(
         if (snakePos[0] == applePoint) {
             snakePos.add(lastPoint)
             generateNewApple()
+            score++
         }
     }
 
