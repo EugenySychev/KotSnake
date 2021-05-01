@@ -2,6 +2,7 @@ package com.sychev.kosnake
 
 import android.graphics.Point
 import java.lang.Exception
+import kotlin.random.Random
 
 class SnakeLogic(
     private var xMax: Int,
@@ -9,7 +10,7 @@ class SnakeLogic(
     private var length: Int
 ) {
 
-    private var applePoint: Point
+    private lateinit var applePoint : Point
     private var snakePos: MutableList<Point> = mutableListOf()
     private var snakeHandler: EventHandler? = null
 
@@ -37,11 +38,11 @@ class SnakeLogic(
                 snakePos.add(Point(snakePos[i - 1].x - 1, snakePos[i - 1].y))
             }
         }
-        applePoint = Point(3, 3)
+        generateNewApple()
     }
 
-    fun eatApple() {
-        length++
+    fun generateNewApple() {
+        applePoint = Point(Random.nextInt(xMax), Random.nextInt((yMax)))
     }
 
     fun changeDirection(newDirection: MoveDirection) {
@@ -57,7 +58,9 @@ class SnakeLogic(
 
 
     fun makeStep() {
-        for (i in length - 1 downTo 1) {
+        val lastPoint = Point(snakePos.last())
+
+        for (i in snakePos.count() - 1 downTo 1) {
             snakePos[i].x = snakePos[i - 1].x
             snakePos[i].y = snakePos[i - 1].y
         }
@@ -72,10 +75,14 @@ class SnakeLogic(
         ) {
             snakeHandler!!.snakeDie()
         }
+        if (snakePos[0] == applePoint) {
+            snakePos.add(lastPoint)
+            generateNewApple()
+        }
     }
 
     fun getLength(): Int {
-        return length
+        return snakePos.count()
     }
 
     fun getApplePoint(): Point {

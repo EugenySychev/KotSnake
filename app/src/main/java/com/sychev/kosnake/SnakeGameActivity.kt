@@ -1,5 +1,6 @@
 package com.sychev.kosnake
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -11,6 +12,7 @@ class SnakeGameActivity : AppCompatActivity() {
     private var snakeLogic : SnakeLogic = SnakeLogic(20, 20, 7)
     private lateinit var view: SnakeDrawer
 
+    @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         view = SnakeDrawer(this)
@@ -46,7 +48,9 @@ class SnakeGameActivity : AppCompatActivity() {
                 snakeLogic.changeDirection(SnakeLogic.MoveDirection.DOWN)
                 view.invalidate()
             }
-
+            fun performClick() : Boolean{
+                return true;
+            }
         })
     }
 
