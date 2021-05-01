@@ -1,7 +1,11 @@
 package com.sychev.kosnake
 
 import android.graphics.Point
+import android.util.Log
 import java.lang.Exception
+import java.util.*
+import android.os.Handler
+import android.os.Looper
 import kotlin.random.Random
 
 class SnakeLogic(
@@ -10,10 +14,19 @@ class SnakeLogic(
     private var length: Int
 ) {
 
-    private lateinit var applePoint : Point
+    private var timePeriod: Long = 1000
+    private var snakeAlive: Boolean = false
+    private lateinit var applePoint: Point
     private var snakePos: MutableList<Point> = mutableListOf()
-    private var snakeHandler: EventHandler? = null
-    var score : Int = 0
+    private var handler: Handler? = null
+    private var runnable: Runnable? = null
+
+    var snakeHandler: EventHandler? = null
+        set(value) {
+            field = value
+        }
+
+    var score: Int = 0
 
     private var direction: MoveDirection = MoveDirection.UP
 
@@ -26,20 +39,34 @@ class SnakeLogic(
 
     interface EventHandler {
         fun snakeDie()
+        fun updateView()
     }
 
     init {
         if (xMax < length + 2) {
             throw Exception("Very big length of snake, unable to locate it")
         } else {
-            snakePos.clear()
-            snakePos.add(Point((xMax - length) / 2, yMax / 2))
-
-            for (i in 1 until length) {
-                snakePos.add(Point(snakePos[i - 1].x - 1, snakePos[i - 1].y))
-            }
+            resetSnake()
         }
         generateNewApple()
+        handler = Handler(Looper.myLooper()!!)
+        runnable = Runnable {
+            makeStep()
+            runnable?.let { handler!!.postDelayed(it, timePeriod) }
+        }
+        runnable?.let { handler!!.postDelayed(it, timePeriod) }
+    }
+
+    public fun resetSnake() {
+        snakePos.clear()
+        snakePos.add(Point((xMax - length) / 2, yMax / 2))
+
+        for (i in 1 until length) {
+            snakePos.add(Point(snakePos[i - 1].x - 1, snakePos[i - 1].y))
+        }
+        score = 0
+        direction = MoveDirection.RIGHT
+        snakeAlive = true
     }
 
     fun generateNewApple() {
@@ -47,8 +74,14 @@ class SnakeLogic(
     }
 
     fun changeDirection(newDirection: MoveDirection) {
-        direction = newDirection
-        makeStep()
+        if ((direction == MoveDirection.UP && newDirection != MoveDirection.DOWN) ||
+            (direction == MoveDirection.DOWN && newDirection != MoveDirection.UP) ||
+            (direction == MoveDirection.LEFT && newDirection != MoveDirection.RIGHT) ||
+            (direction == MoveDirection.RIGHT && newDirection != MoveDirection.LEFT)
+        ) {
+            direction = newDirection
+            makeStep()
+        }
     }
 
     fun getSnakePos(index: Int) =
@@ -59,28 +92,53 @@ class SnakeLogic(
 
 
     fun makeStep() {
-        val lastPoint = Point(snakePos.last())
 
-        for (i in snakePos.count() - 1 downTo 1) {
-            snakePos[i].x = snakePos[i - 1].x
-            snakePos[i].y = snakePos[i - 1].y
+        if (snakeAlive) {
+
+            val lastPoint = Point(snakePos.last())
+
+            for (i in snakePos.count() - 1 downTo 1) {
+                snakePos[i].x = snakePos[i - 1].x
+                snakePos[i].y = snakePos[i - 1].y
+            }
+            when (direction) {
+                MoveDirection.UP -> snakePos[0].y -= 1
+                MoveDirection.DOWN -> snakePos[0].y += 1
+                MoveDirection.LEFT -> snakePos[0].x -= 1
+                MoveDirection.RIGHT -> snakePos[0].x += 1
+            }
+            if (snakePos[0].x > xMax || snakePos[0].x < 0 ||
+                snakePos[0].y > yMax || snakePos[0].y < 0
+            )
+                snakeBeginDie()
+            if (snakePos[0] == applePoint) {
+                snakePos.add(lastPoint)
+                generateNewApple()
+                increaseScore()
+            }
+
+            for (i in 1 until snakePos.count()) {
+                if (snakePos[0] == snakePos[i]) {
+                    snakeBeginDie()
+                }
+            }
+            if (snakeHandler != null)
+                snakeHandler!!.updateView()
         }
-        when (direction) {
-            MoveDirection.UP -> snakePos[0].y -= 1
-            MoveDirection.DOWN -> snakePos[0].y += 1
-            MoveDirection.LEFT -> snakePos[0].x -= 1
-            MoveDirection.RIGHT -> snakePos[0].x += 1
-        }
-        if (snakePos[0].x > xMax || snakePos[0].x < 0 ||
-            snakePos[0].y > yMax || snakePos[0].y < 0
-        ) {
+    }
+
+    private fun increaseScore() {
+        score++ // DISCUSSING FOR LOGIC
+        if (score < 80)
+            timePeriod = (1000 - score * 10).toLong()
+        else
+            timePeriod = (280 - score).toLong()
+    }
+
+    private final fun snakeBeginDie() {
+        snakeAlive = false
+        if (snakeHandler != null)
             snakeHandler!!.snakeDie()
-        }
-        if (snakePos[0] == applePoint) {
-            snakePos.add(lastPoint)
-            generateNewApple()
-            score++
-        }
     }
 
     fun getLength(): Int {

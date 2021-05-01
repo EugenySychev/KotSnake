@@ -8,7 +8,7 @@ import android.graphics.Point
 import android.util.Log
 import android.view.View
 
-class SnakeDrawer(context: Context?) : View(context) {
+class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
     private var applePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var snakePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -21,6 +21,7 @@ class SnakeDrawer(context: Context?) : View(context) {
     var xMax: Int = maxCubeNumber
     var yMax: Int = maxCubeNumber
     private var bottomBarSize: Int = 0
+    var snakeAlive : Boolean = true
 
     init {
         if (context != null) {
@@ -66,6 +67,7 @@ class SnakeDrawer(context: Context?) : View(context) {
 
     fun setSnake(snake: SnakeLogic) {
         this.snake = snake
+        snake.snakeHandler = this
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -111,5 +113,13 @@ class SnakeDrawer(context: Context?) : View(context) {
             ((pos.x + 1) * cubeSize).toFloat() - thinkness * 4,
             ((pos.y + 1) * cubeSize + bottomBarSize).toFloat() - thinkness * 4,
             paint)
+    }
+
+    override fun snakeDie() {
+        snake!!.resetSnake()
+    }
+
+    override fun updateView() {
+        invalidate()
     }
 }
