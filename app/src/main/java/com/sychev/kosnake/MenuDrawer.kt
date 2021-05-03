@@ -67,9 +67,6 @@ class MenuDrawer(context: Context) : View(context), View.OnTouchListener {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         if (canvas != null) {
-//            uncomment it background needed
-//            canvas.drawARGB(80, -, 204, 255)
-            canvas.translate(0F, 0F)
 
             if (itemList.count() > 0 && rectList.count() > 0)
                 for (i in 0 until itemList.count()) {

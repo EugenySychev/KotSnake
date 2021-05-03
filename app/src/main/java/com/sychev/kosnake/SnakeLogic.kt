@@ -54,6 +54,8 @@ class SnakeLogic(
             runnable?.let { handler!!.postDelayed(it, timePeriod) }
         }
         runnable?.let { handler!!.postDelayed(it, timePeriod) }
+
+        generateNewApple()
     }
 
     fun resetSnake() {

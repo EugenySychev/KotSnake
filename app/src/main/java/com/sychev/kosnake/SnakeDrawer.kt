@@ -1,10 +1,7 @@
 package com.sychev.kosnake
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Point
+import android.graphics.*
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -12,6 +9,7 @@ import android.view.View
 
 class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
+    private var menuPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var snakeBlinker: Runnable? = null
     private var blinkHandler: Handler? = null
     private var currentBlink: Int = 0
@@ -28,6 +26,13 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     var yMax: Int = maxCubeNumber
     private var bottomBarSize: Int = 0
     var snakeAlive: Boolean = true
+
+    private var menuRects: MutableList<Rect> = mutableListOf()
+    private var drawerHandler: DrawerHandler? = null
+
+    interface DrawerHandler{
+        fun exitGame()
+    }
 
     init {
         if (context != null) {
@@ -58,6 +63,9 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
         scorePaint.style = Paint.Style.FILL
         scorePaint.color = Color.YELLOW
 
+        menuPaint.style = Paint.Style.FILL
+        menuPaint.color = Color.GREEN
+
         blinkHandler = Handler(Looper.myLooper()!!)
         snakeBlinker = Runnable {
             currentBlink++
@@ -67,9 +75,14 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
                 blinkComplete = true
                 currentBlink = 0
             } else {
-                snakeBlinker?.let { blinkHandler!!.postDelayed(it, 500) }
+                snakeBlinker?.let { blinkHandler?.postDelayed(it, 500) }
             }
         }
+    }
+
+    fun setDrawerHandler(drawerHandler: DrawerHandler)
+    {
+        this.drawerHandler = drawerHandler
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -110,7 +123,7 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     }
 
     private fun drawScore(canvas: Canvas?) {
-        val scoreText: String = snake!!.score.toString()
+        val scoreText: String = snake?.score.toString()
         val scoreWidth = scorePaint.measureText(scoreText)
         canvas?.drawText(scoreText,
             (width - scoreWidth) / 2,
@@ -127,7 +140,18 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     }
 
     private fun drawMenu(canvas: Canvas?) {
-        canvas!!.drawText("RESTART", 300f, 300f, snakePaint)
+
+        menuPaint.textSize = (height / 10).toFloat()
+        var menuItems: List<String> = arrayListOf("Restart", "Exit")
+        menuRects.clear()
+        for (i in 0 until menuItems.count()) {
+            var bound: Rect = Rect()
+            menuPaint.getTextBounds(menuItems[i], 0, menuItems[i].length, bound)
+            bound.offset(((width - menuPaint.measureText(menuItems[i])) / 2).toInt(), i * height / 6  + height / 2)
+            menuRects.add(bound)
+            canvas?.drawText(menuItems[i], bound.left.toFloat(), bound.bottom.toFloat(), menuPaint)
+        }
+
     }
 
     private fun drawSnake(canvas: Canvas?) {
@@ -162,6 +186,8 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
     override fun snakeDie() {
         snakeAlive = false
+        currentBlink = 0
+        blinkComplete = false
         snakeBlinker?.let { blinkHandler!!.postDelayed(it, 500) }
 //        snake!!.resetSnake()
     }
@@ -176,9 +202,15 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
         if (snakeAlive)
             snake?.makeStep()
         else {
-            blinkComplete = true
-            snakeAlive = true
-            snake?.resetSnake()
+            if (blinkComplete) {
+                if (menuRects[0].contains(x.toInt(), y.toInt())) {
+                    snakeAlive = true
+                    snake?.resetSnake()
+                } else if (menuRects[1].contains(x.toInt(), y.toInt())) {
+                    drawerHandler?.exitGame()
+                }
+            }
+
         }
     }
 }
