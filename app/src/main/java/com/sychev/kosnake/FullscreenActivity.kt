@@ -1,5 +1,6 @@
 package com.sychev.kosnake
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,7 @@ class FullscreenActivity : AppCompatActivity(), MenuDrawer.SelectedItem {
         super.onCreate(savedInstanceState)
         var menu = MenuDrawer(this)
 
-        val list = listOf<String>("Main", "Second", "Third")
+        val list = listOf<String>("Play", "Settings", "Exit game")
         menu.setSelectedItemHandler(this)
         menu.setItemArray(list)
         setContentView(menu)
@@ -20,6 +21,17 @@ class FullscreenActivity : AppCompatActivity(), MenuDrawer.SelectedItem {
     }
 
     override fun onSelectedItem(item: Int) {
-        Log.d("Menu", "Selected item $item")
+        when (item) {
+            0 -> {
+                val intent = Intent(this, SnakeGameActivity::class.java)
+                startActivity(intent)
+            }
+            1 -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+            2 -> finish()
+        }
+
     }
 }

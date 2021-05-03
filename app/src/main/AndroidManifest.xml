@@ -10,8 +10,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KoSnake">
         <activity
-            android:name=".SnakeGameActivity"
+            android:name=".SettingsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.Design.NoActionBar" />
+        <activity
+            android:name=".SnakeGameActivity"
+            android:configChanges="keyboardHidden|screenSize"
+            android:label="@string/title_snake_game_activity"
+            android:theme="@style/Theme.Design.NoActionBar" />
+        <activity
+            android:name=".FullscreenActivity"
+            android:configChanges="keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/Theme.Design.NoActionBar">
             <intent-filter>

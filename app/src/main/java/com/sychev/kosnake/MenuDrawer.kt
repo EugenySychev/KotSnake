@@ -51,7 +51,7 @@ class MenuDrawer(context: Context) : View(context), View.OnTouchListener {
         val count = itemList.count()
         heightSplit = (h / 20).toFloat()
         vertBorder = ((h - (count - 1) * heightSplit) / (count + 2)).toFloat()
-        fontPaint.textSize = vertBorder
+        fontPaint.textSize = vertBorder / 3
         for (i in 0 until itemList.count()) {
             val y = vertBorder * (i + 1.5f) + i * heightSplit
             val rectangle: Rect = Rect(((w - fontPaint.measureText(itemList[i])) / 2).toInt(),

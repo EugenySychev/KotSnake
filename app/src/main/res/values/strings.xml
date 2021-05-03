@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">KoSnake</string>
+    <string name="title_activity_settings">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_snake_game_activity">SnakeGame</string>
 </resources>
