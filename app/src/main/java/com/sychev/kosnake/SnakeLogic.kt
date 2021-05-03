@@ -1,11 +1,10 @@
 package com.sychev.kosnake
 
 import android.graphics.Point
-import android.util.Log
 import java.lang.Exception
-import java.util.*
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import kotlin.random.Random
 
 class SnakeLogic(
@@ -14,7 +13,8 @@ class SnakeLogic(
     private var length: Int
 ) {
 
-    private var timePeriod: Long = 1000
+    private val initialTimer = 500L
+    private var timePeriod: Long = initialTimer
     private var snakeAlive: Boolean = false
     private lateinit var applePoint: Point
     private var snakePos: MutableList<Point> = mutableListOf()
@@ -80,7 +80,6 @@ class SnakeLogic(
             (direction == MoveDirection.RIGHT && newDirection != MoveDirection.LEFT)
         ) {
             direction = newDirection
-            makeStep()
         }
     }
 
@@ -124,15 +123,17 @@ class SnakeLogic(
             }
             if (snakeHandler != null)
                 snakeHandler!!.updateView()
+
+            Log.d("SNAKE", "Step $snakePos[0]")
         }
     }
 
     private fun increaseScore() {
         score++ // DISCUSSING FOR LOGIC
-        if (score < 80)
-            timePeriod = (1000 - score * 10).toLong()
-        else
-            timePeriod = (280 - score).toLong()
+//        if (score % 5 == 0)
+        timePeriod = (timePeriod / 1.125f).toLong()
+//        else
+//            timePeriod = (280 - score).toLong()
     }
 
     private final fun snakeBeginDie() {
@@ -147,6 +148,12 @@ class SnakeLogic(
 
     fun getApplePoint(): Point {
         return applePoint
+    }
+
+    fun setMaxSize(xMax: Int, yMax: Int) {
+        this.xMax = xMax
+        this.yMax = yMax
+        Log.d("SNAKE", "CHanged max to $xMax, $yMax")
     }
 
 }

@@ -21,7 +21,7 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     var xMax: Int = maxCubeNumber
     var yMax: Int = maxCubeNumber
     private var bottomBarSize: Int = 0
-    var snakeAlive : Boolean = true
+    var snakeAlive: Boolean = true
 
     init {
         if (context != null) {
@@ -56,13 +56,14 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         if (w > h) {
-            cubeSize = h / maxCubeNumber - 1
-            xMax = w / cubeSize
+            cubeSize = (h - bottomBarSize) / maxCubeNumber - 1
+            xMax = w / (cubeSize + 1)
         } else {
             cubeSize = w / maxCubeNumber - 1
-            yMax = h / cubeSize
+            yMax = (h - bottomBarSize) / (cubeSize + 1)
         }
         thinkness = (cubeSize / 10).toFloat()
+        snake!!.setMaxSize(xMax, yMax)
     }
 
     fun setSnake(snake: SnakeLogic) {
@@ -81,7 +82,7 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
         canvas?.drawRect(1F,
             1F + bottomBarSize.toFloat(),
             (xMax * (cubeSize + 1) - thinkness).toFloat(),
-            (yMax * (cubeSize + 1) - thinkness * 20).toFloat(),
+            (yMax * (cubeSize + 1) - thinkness + bottomBarSize).toFloat(),
             borderPaint)
 
         val scoreText: String = snake!!.score.toString()
@@ -102,16 +103,16 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
     private fun drawCube(canvas: Canvas?, pos: Point, paint: Paint) {
         paint.style = Paint.Style.STROKE;
-        canvas?.drawRect((pos.x * cubeSize).toFloat(),
-            (pos.y * cubeSize + bottomBarSize).toFloat(),
-            ((pos.x + 1) * cubeSize).toFloat() - thinkness * 2,
-            ((pos.y + 1) * cubeSize + bottomBarSize).toFloat() - thinkness * 2,
+        canvas?.drawRect((pos.x * cubeSize + thinkness).toFloat(),
+            (pos.y * cubeSize + bottomBarSize + thinkness).toFloat(),
+            ((pos.x + 1) * cubeSize).toFloat() - thinkness,
+            ((pos.y + 1) * cubeSize + bottomBarSize + thinkness).toFloat() - thinkness * 2,
             paint)
         paint.style = Paint.Style.FILL
-        canvas?.drawRect((pos.x * cubeSize + thinkness * 2).toFloat(),
-            (pos.y * cubeSize + thinkness * 2 + bottomBarSize).toFloat(),
-            ((pos.x + 1) * cubeSize).toFloat() - thinkness * 4,
-            ((pos.y + 1) * cubeSize + bottomBarSize).toFloat() - thinkness * 4,
+        canvas?.drawRect((pos.x * cubeSize + thinkness * 3).toFloat(),
+            (pos.y * cubeSize + thinkness * 3 + bottomBarSize).toFloat(),
+            ((pos.x + 1) * cubeSize).toFloat() - thinkness * 3,
+            ((pos.y + 1) * cubeSize + bottomBarSize).toFloat() - thinkness * 3,
             paint)
     }
 
