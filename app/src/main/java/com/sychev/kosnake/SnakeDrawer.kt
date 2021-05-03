@@ -63,7 +63,7 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
             currentBlink++
             invalidate()
 
-            if (currentBlink > 8) {
+            if (currentBlink > 8 || blinkComplete) {
                 blinkComplete = true
                 currentBlink = 0
             } else {
@@ -168,5 +168,17 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
     override fun updateView() {
         invalidate()
+    }
+
+    fun click(x: Float, y: Float) {
+        Log.d("Snake", "Tap $snakeAlive")
+
+        if (snakeAlive)
+            snake?.makeStep()
+        else {
+            blinkComplete = true
+            snakeAlive = true
+            snake?.resetSnake()
+        }
     }
 }

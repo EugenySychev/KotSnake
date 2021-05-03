@@ -48,7 +48,6 @@ class SnakeLogic(
         } else {
             resetSnake()
         }
-        generateNewApple()
         handler = Handler(Looper.myLooper()!!)
         runnable = Runnable {
             makeStep()
@@ -57,7 +56,7 @@ class SnakeLogic(
         runnable?.let { handler!!.postDelayed(it, timePeriod) }
     }
 
-    public fun resetSnake() {
+    fun resetSnake() {
         snakePos.clear()
         snakePos.add(Point((xMax - length) / 2, yMax / 2))
 
@@ -71,6 +70,11 @@ class SnakeLogic(
 
     fun generateNewApple() {
         applePoint = Point(Random.nextInt(xMax), Random.nextInt((yMax)))
+
+        if (snakePos.count() > 0) {
+            while (snakePos.indexOf(applePoint) != -1)
+                applePoint = Point(Random.nextInt(xMax), Random.nextInt((yMax)))
+        }
     }
 
     fun changeDirection(newDirection: MoveDirection) {
@@ -150,7 +154,8 @@ class SnakeLogic(
     fun setMaxSize(xMax: Int, yMax: Int) {
         this.xMax = xMax
         this.yMax = yMax
-        Log.d("SNAKE", "CHanged max to $xMax, $yMax")
+        generateNewApple()
     }
+
 
 }

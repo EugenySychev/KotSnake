@@ -2,9 +2,6 @@ package com.sychev.kosnake
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class SnakeGameActivity : AppCompatActivity() {
@@ -20,10 +17,6 @@ class SnakeGameActivity : AppCompatActivity() {
 
         snakeLogic = SnakeLogic(view.xMax, view.yMax, 7)
         view.setSnake(snakeLogic)
-        view.setOnClickListener {
-            snakeLogic.makeStep();
-            view.invalidate()
-        }
 
         view.setOnTouchListener(object : OnSwipeTouchListener(this@SnakeGameActivity) {
             override fun onSwipeUp() {
@@ -48,9 +41,11 @@ class SnakeGameActivity : AppCompatActivity() {
                 snakeLogic.changeDirection(SnakeLogic.MoveDirection.DOWN)
                 view.invalidate()
             }
-            fun performClick() : Boolean{
-                return true;
+
+            override fun onClick(x: Float, y: Float) {
+                view.click(x, y)
             }
+
         })
     }
 
@@ -61,7 +56,6 @@ class SnakeGameActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
     }
 
     private fun goToPauseState() {

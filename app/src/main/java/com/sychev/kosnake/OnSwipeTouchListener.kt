@@ -24,7 +24,7 @@ internal open class OnSwipeTouchListener(c: Context?) :
         }
 
         override fun onSingleTapUp(e: MotionEvent): Boolean {
-            onClick()
+            onClick(e.x, e.y)
             return super.onSingleTapUp(e)
         }
 
@@ -83,7 +83,7 @@ internal open class OnSwipeTouchListener(c: Context?) :
     open fun onSwipeLeft() {}
     open fun onSwipeUp() {}
     open fun onSwipeDown() {}
-    private fun onClick() {}
+    open fun onClick(x: Float, y: Float) {}
     private fun onDoubleClick() {}
     private fun onLongClick() {}
 
