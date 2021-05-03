@@ -5,11 +5,17 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 
 class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
+    private var snakeBlinker: Runnable? = null
+    private var blinkHandler: Handler? = null
+    private var currentBlink: Int = 0
+    private var blinkComplete: Boolean = false
     private var applePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var snakePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var borderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -51,6 +57,19 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
         scorePaint.style = Paint.Style.FILL
         scorePaint.color = Color.YELLOW
+
+        blinkHandler = Handler(Looper.myLooper()!!)
+        snakeBlinker = Runnable {
+            currentBlink++
+            invalidate()
+
+            if (currentBlink > 8) {
+                blinkComplete = true
+                currentBlink = 0
+            } else {
+                snakeBlinker?.let { blinkHandler!!.postDelayed(it, 500) }
+            }
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -73,24 +92,49 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        if (canvas != null && snake != null) {
-            for (i in 0 until snake!!.getLength()) {
-                drawSnakeCube(canvas, snake!!.getSnakePos(i))
+
+        drawBorders(canvas)
+        drawScore(canvas)
+
+        if (snakeAlive) {
+            drawSnake(canvas)
+        } else {
+            if (blinkComplete) {
+                drawMenu(canvas)
+            } else {
+                if (currentBlink % 2 == 0) {
+                    drawSnake(canvas)
+                }
             }
-            drawAppleCube(canvas, snake!!.getApplePoint());
         }
+    }
+
+    private fun drawScore(canvas: Canvas?) {
+        val scoreText: String = snake!!.score.toString()
+        val scoreWidth = scorePaint.measureText(scoreText)
+        canvas?.drawText(scoreText,
+            (width - scoreWidth) / 2,
+            (cubeSize * 2).toFloat(),
+            scorePaint)
+    }
+
+    private fun drawBorders(canvas: Canvas?) {
         canvas?.drawRect(1F,
             1F + bottomBarSize.toFloat(),
             (xMax * (cubeSize + 1) - thinkness).toFloat(),
             (yMax * (cubeSize + 1) - thinkness + bottomBarSize).toFloat(),
             borderPaint)
+    }
 
-        val scoreText: String = snake!!.score.toString()
-        val scoreWidth = scorePaint.measureText(scoreText)
-        canvas?.drawText(scoreText, (width - scoreWidth) / 2, (cubeSize * 2).toFloat(), scorePaint)
-        Log.d("Painter", "Size $width, $height " + (xMax * (cubeSize + 1) - thinkness).toString()
-                + "  " + (yMax * (cubeSize + 1) - thinkness).toString())
+    private fun drawMenu(canvas: Canvas?) {
+        canvas!!.drawText("RESTART", 300f, 300f, snakePaint)
+    }
 
+    private fun drawSnake(canvas: Canvas?) {
+        for (i in 0 until snake!!.getLength()) {
+            drawSnakeCube(canvas, snake!!.getSnakePos(i))
+        }
+        drawAppleCube(canvas, snake!!.getApplePoint());
     }
 
     private fun drawAppleCube(canvas: Canvas?, applePoint: Point) {
@@ -117,7 +161,9 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     }
 
     override fun snakeDie() {
-        snake!!.resetSnake()
+        snakeAlive = false
+        snakeBlinker?.let { blinkHandler!!.postDelayed(it, 500) }
+//        snake!!.resetSnake()
     }
 
     override fun updateView() {

@@ -129,11 +129,8 @@ class SnakeLogic(
     }
 
     private fun increaseScore() {
-        score++ // DISCUSSING FOR LOGIC
-//        if (score % 5 == 0)
+        score++
         timePeriod = (timePeriod / 1.125f).toLong()
-//        else
-//            timePeriod = (280 - score).toLong()
     }
 
     private final fun snakeBeginDie() {
