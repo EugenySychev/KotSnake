@@ -13,7 +13,7 @@ class FullscreenActivity : AppCompatActivity(), MenuDrawer.SelectedItem {
         super.onCreate(savedInstanceState)
         var menu = MenuDrawer(this)
 
-        val list = listOf<String>("Play", "Settings", "Exit game")
+        val list = listOf("Play", "Exit game")
         menu.setSelectedItemHandler(this)
         menu.setItemArray(list)
         setContentView(menu)
@@ -26,11 +26,11 @@ class FullscreenActivity : AppCompatActivity(), MenuDrawer.SelectedItem {
                 val intent = Intent(this, SnakeGameActivity::class.java)
                 startActivity(intent)
             }
-            1 -> {
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-            }
-            2 -> finish()
+//            1 -> {
+//                val intent = Intent(this, SettingsActivity::class.java)
+//                startActivity(intent)
+//            }
+            1 -> finish()
         }
 
     }

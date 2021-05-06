@@ -54,7 +54,7 @@ class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler {
 
     override fun onPause() {
         super.onPause()
-        goToPauseState();
+        view.setPauseState();
     }
 
     override fun onResume() {

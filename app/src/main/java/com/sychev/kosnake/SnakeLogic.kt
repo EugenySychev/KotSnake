@@ -20,7 +20,7 @@ class SnakeLogic(
     private var snakePos: MutableList<Point> = mutableListOf()
     private var handler: Handler? = null
     private var runnable: Runnable? = null
-
+    private var onPause : Boolean = false
     var snakeHandler: EventHandler? = null
         set(value) {
             field = value
@@ -98,7 +98,7 @@ class SnakeLogic(
 
     fun makeStep() {
 
-        if (snakeAlive) {
+        if (snakeAlive && !onPause) {
 
             val lastPoint = Point(snakePos.last())
 
@@ -130,7 +130,6 @@ class SnakeLogic(
             if (snakeHandler != null)
                 snakeHandler!!.updateView()
 
-            Log.d("SNAKE", "Step $snakePos[0]")
         }
     }
 
@@ -157,6 +156,10 @@ class SnakeLogic(
         this.xMax = xMax
         this.yMax = yMax
         generateNewApple()
+    }
+
+    fun setPause(b: Boolean) {
+        onPause = b
     }
 
 

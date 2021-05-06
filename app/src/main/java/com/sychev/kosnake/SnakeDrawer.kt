@@ -9,6 +9,7 @@ import android.view.View
 
 class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
+    private var onPause: Boolean = false
     private var menuPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var snakeBlinker: Runnable? = null
     private var blinkHandler: Handler? = null
@@ -26,11 +27,12 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     var yMax: Int = maxCubeNumber
     private var bottomBarSize: Int = 0
     var snakeAlive: Boolean = true
+    private var pauseRect: Rect = Rect()
 
     private var menuRects: MutableList<Rect> = mutableListOf()
     private var drawerHandler: DrawerHandler? = null
 
-    interface DrawerHandler{
+    interface DrawerHandler {
         fun exitGame()
     }
 
@@ -80,8 +82,7 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
         }
     }
 
-    fun setDrawerHandler(drawerHandler: DrawerHandler)
-    {
+    fun setDrawerHandler(drawerHandler: DrawerHandler) {
         this.drawerHandler = drawerHandler
     }
 
@@ -109,11 +110,13 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
         drawBorders(canvas)
         drawScore(canvas)
 
-        if (snakeAlive) {
+        if (snakeAlive && !onPause) {
             drawSnake(canvas)
-        } else {
+        } else if (snakeAlive && onPause) {
+            drawMenu(canvas, true)
+        } else if (!snakeAlive) {
             if (blinkComplete) {
-                drawMenu(canvas)
+                drawMenu(canvas, false)
             } else {
                 if (currentBlink % 2 == 0) {
                     drawSnake(canvas)
@@ -129,6 +132,13 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
             (width - scoreWidth) / 2,
             (cubeSize * 2).toFloat(),
             scorePaint)
+
+        canvas?.drawText("Pause", width - scorePaint.measureText("Pause Pause"),
+            (cubeSize * 2).toFloat(), scorePaint)
+        pauseRect.left = (width - scorePaint.measureText("Pause Pause")).toInt()
+        pauseRect.right = width
+        pauseRect.top = 0
+        pauseRect.bottom = cubeSize * 3
     }
 
     private fun drawBorders(canvas: Canvas?) {
@@ -139,15 +149,16 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
             borderPaint)
     }
 
-    private fun drawMenu(canvas: Canvas?) {
+    private fun drawMenu(canvas: Canvas?, pause: Boolean) {
 
         menuPaint.textSize = (height / 10).toFloat()
-        var menuItems: List<String> = arrayListOf("Restart", "Exit")
+        val menuItems: List<String> = if (pause) arrayListOf("Continue", "Exit") else arrayListOf("Restart", "Exit")
         menuRects.clear()
         for (i in 0 until menuItems.count()) {
             var bound: Rect = Rect()
             menuPaint.getTextBounds(menuItems[i], 0, menuItems[i].length, bound)
-            bound.offset(((width - menuPaint.measureText(menuItems[i])) / 2).toInt(), i * height / 6  + height / 2)
+            bound.offset(((width - menuPaint.measureText(menuItems[i])) / 2).toInt(),
+                i * height / 6 + height / 2)
             menuRects.add(bound)
             canvas?.drawText(menuItems[i], bound.left.toFloat(), bound.bottom.toFloat(), menuPaint)
         }
@@ -199,9 +210,20 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     fun click(x: Float, y: Float) {
         Log.d("Snake", "Tap $snakeAlive")
 
-        if (snakeAlive)
-            snake?.makeStep()
-        else {
+        if (snakeAlive && !onPause) {
+            if (pauseRect.contains(x.toInt(), y.toInt())) {
+                setPauseState()
+            } else {
+                snake?.makeStep()
+            }
+        } else if (snakeAlive && onPause) {
+            if (menuRects[0].contains(x.toInt(), y.toInt())) {
+                onPause = false
+                snake?.setPause(false)
+            } else if (menuRects[1].contains(x.toInt(), y.toInt())) {
+                drawerHandler?.exitGame()
+            }
+        } else {
             if (blinkComplete) {
                 if (menuRects[0].contains(x.toInt(), y.toInt())) {
                     snakeAlive = true
@@ -210,7 +232,12 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
                     drawerHandler?.exitGame()
                 }
             }
-
         }
+    }
+
+    fun setPauseState() {
+        snake?.setPause(true)
+        onPause = true
+        invalidate()
     }
 }
