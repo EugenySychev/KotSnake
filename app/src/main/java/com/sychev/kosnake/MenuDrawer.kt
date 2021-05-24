@@ -26,7 +26,7 @@ class MenuDrawer(context: Context) : View(context), View.OnTouchListener {
 
     init {
         fontPaint.textSize = fontSize.toFloat()
-        fontPaint.style = Paint.Style.STROKE
+        fontPaint.style = Paint.Style.FILL
         fontPaint.color = Color.GREEN
         setOnTouchListener(this)
     }

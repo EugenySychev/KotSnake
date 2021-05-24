@@ -1,11 +1,14 @@
 package com.sychev.kosnake
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.*
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import androidx.core.graphics.withTranslation
+import kotlin.math.roundToInt
 
 class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
@@ -20,14 +23,16 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     var borderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var scorePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var cubeSize: Int = 0
-    private val maxCubeNumber = 30
+    private val maxCubeNumber = 20
     private var snake: SnakeLogic? = null;
-    private var thinkness: Float = 10F
+    private var thinkness: Float = 5F
     var xMax: Int = maxCubeNumber
     var yMax: Int = maxCubeNumber
     private var bottomBarSize: Int = 0
     var snakeAlive: Boolean = true
     private var pauseRect: Rect = Rect()
+
+    private var borderRect: Rect = Rect()
 
     private var menuRects: MutableList<Rect> = mutableListOf()
     private var drawerHandler: DrawerHandler? = null
@@ -45,28 +50,11 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
                 cubeSize = context.resources.displayMetrics.widthPixels / maxCubeNumber - 1
                 yMax = context.resources.displayMetrics.heightPixels / cubeSize
             }
-            thinkness = (cubeSize / 10).toFloat()
-
+//            thinkness = (cubeSize / 10).toFloat()
             scorePaint.textSize = cubeSize.toFloat()
             bottomBarSize = cubeSize * 3// I don't know why
         }
-
-        snakePaint.style = Paint.Style.STROKE
-        snakePaint.color = Color.GREEN
-        snakePaint.strokeWidth = thinkness
-        applePaint.style = Paint.Style.STROKE
-        applePaint.strokeWidth = thinkness
-        applePaint.color = Color.RED
-
-        borderPaint.style = Paint.Style.STROKE
-        borderPaint.strokeWidth = thinkness
-        borderPaint.color = Color.BLUE
-
-        scorePaint.style = Paint.Style.FILL
-        scorePaint.color = Color.YELLOW
-
-        menuPaint.style = Paint.Style.FILL
-        menuPaint.color = Color.GREEN
+        setupPainers()
 
         blinkHandler = Handler(Looper.myLooper()!!)
         snakeBlinker = Runnable {
@@ -82,21 +70,50 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
         }
     }
 
+    private fun setupPainers() {
+        snakePaint.style = Paint.Style.STROKE
+        snakePaint.color = Color.GREEN
+        applePaint.style = Paint.Style.STROKE
+        applePaint.color = Color.RED
+        borderPaint.style = Paint.Style.STROKE
+        borderPaint.color = Color.BLUE
+        scorePaint.style = Paint.Style.FILL
+        scorePaint.color = Color.YELLOW
+        menuPaint.style = Paint.Style.FILL
+        menuPaint.color = Color.GREEN
+        updatePainterWidth()
+    }
+
     fun setDrawerHandler(drawerHandler: DrawerHandler) {
         this.drawerHandler = drawerHandler
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        thinkness = 5f
+        xMax = maxCubeNumber;
+        yMax = maxCubeNumber;
         if (w > h) {
-            cubeSize = (h - bottomBarSize) / maxCubeNumber - 1
-            xMax = w / (cubeSize + 1)
+            cubeSize = (((h - bottomBarSize - 3 * thinkness ) / maxCubeNumber) - 2 * thinkness).toInt()
+            xMax = (w - getBottomBarSize()) / (cubeSize)
         } else {
-            cubeSize = w / maxCubeNumber - 1
-            yMax = (h - bottomBarSize) / (cubeSize + 1)
+            cubeSize = ((w - 3 * thinkness ) / maxCubeNumber - 2 * thinkness).toInt()
+            yMax = ((h - bottomBarSize - thinkness * 3 - getBottomBarSize()) / (cubeSize + thinkness) ).roundToInt()
         }
-        thinkness = (cubeSize / 10).toFloat()
+        Log.d("Painter", "Set $xMax and $yMax cubesize if $cubeSize, h is $h $bottomBarSize")
+//        thinkness = (cubeSize / 10).toFloat()
         snake!!.setMaxSize(xMax, yMax)
+        borderRect = Rect((thinkness / 2).toInt(),
+            (thinkness/ 2 + bottomBarSize).toInt(),
+            (w - thinkness/ 2).toInt(),
+            (h - thinkness  /2).toInt())
+        updatePainterWidth()
+    }
+
+    private fun updatePainterWidth() {
+        borderPaint.strokeWidth = thinkness
+        applePaint.strokeWidth = thinkness
+        snakePaint.strokeWidth = thinkness
     }
 
     fun setSnake(snake: SnakeLogic) {
@@ -125,6 +142,14 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
         }
     }
 
+    private fun getBottomBarSize(): Int {
+        val resources: Resources = context.resources
+        val resourceId: Int = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        return if (resourceId > 0) {
+            resources.getDimensionPixelSize(resourceId)
+        } else 0
+    }
+
     private fun drawScore(canvas: Canvas?) {
         val scoreText: String = snake?.score.toString()
         val scoreWidth = scorePaint.measureText(scoreText)
@@ -142,17 +167,18 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     }
 
     private fun drawBorders(canvas: Canvas?) {
-        canvas?.drawRect(1F,
-            1F + bottomBarSize.toFloat(),
-            (xMax * (cubeSize + 1) - thinkness).toFloat(),
-            (yMax * (cubeSize + 1) - thinkness + bottomBarSize).toFloat(),
-            borderPaint)
+        canvas?.drawRect(borderRect, borderPaint)//thinkness / 2,
+//            bottomBarSize.toFloat() + thinkness / 2,
+//            (xMax + 2) * (cubeSize + thinkness) + thinkness,
+//            (yMax + 2) * (cubeSize + thinkness) + thinkness + bottomBarSize,
+//            borderPaint)
     }
 
     private fun drawMenu(canvas: Canvas?, pause: Boolean) {
 
         menuPaint.textSize = (height / 10).toFloat()
-        val menuItems: List<String> = if (pause) arrayListOf("Continue", "Exit") else arrayListOf("Restart", "Exit")
+        val menuItems: List<String> =
+            if (pause) arrayListOf("Continue", "Exit") else arrayListOf("Restart", "Exit")
         menuRects.clear()
         for (i in 0 until menuItems.count()) {
             var bound: Rect = Rect()
@@ -182,17 +208,21 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
     private fun drawCube(canvas: Canvas?, pos: Point, paint: Paint) {
         paint.style = Paint.Style.STROKE;
-        canvas?.drawRect((pos.x * cubeSize + thinkness).toFloat(),
-            (pos.y * cubeSize + bottomBarSize + thinkness).toFloat(),
-            ((pos.x + 1) * cubeSize).toFloat() - thinkness,
-            ((pos.y + 1) * cubeSize + bottomBarSize + thinkness).toFloat() - thinkness * 2,
-            paint)
-        paint.style = Paint.Style.FILL
-        canvas?.drawRect((pos.x * cubeSize + thinkness * 3).toFloat(),
-            (pos.y * cubeSize + thinkness * 3 + bottomBarSize).toFloat(),
-            ((pos.x + 1) * cubeSize).toFloat() - thinkness * 3,
-            ((pos.y + 1) * cubeSize + bottomBarSize).toFloat() - thinkness * 3,
-            paint)
+
+        canvas?.withTranslation(thinkness * 2, thinkness * 2 + bottomBarSize) {
+
+            canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness / 2),
+                (pos.y * (cubeSize + thinkness * 2) + thinkness / 2),
+                ((pos.x + 1) * (cubeSize + thinkness * 2) - 2 * thinkness),
+                ((pos.y + 1) * (cubeSize + thinkness * 2) - 2 * thinkness),
+                paint)
+            paint.style = Paint.Style.FILL
+            canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness * 5 / 2),
+                (pos.y * (cubeSize + thinkness * 2) + thinkness * 5 / 2 ),
+                ((pos.x + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
+                ((pos.y + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
+                paint)
+        }
     }
 
     override fun snakeDie() {

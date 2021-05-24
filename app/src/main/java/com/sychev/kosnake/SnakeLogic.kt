@@ -20,7 +20,7 @@ class SnakeLogic(
     private var snakePos: MutableList<Point> = mutableListOf()
     private var handler: Handler? = null
     private var runnable: Runnable? = null
-    private var onPause : Boolean = false
+    private var onPause: Boolean = false
     var snakeHandler: EventHandler? = null
         set(value) {
             field = value
@@ -100,22 +100,31 @@ class SnakeLogic(
 
         if (snakeAlive && !onPause) {
 
+            var newPoint: Point = Point()
             val lastPoint = Point(snakePos.last())
 
-            for (i in snakePos.count() - 1 downTo 1) {
-                snakePos[i].x = snakePos[i - 1].x
-                snakePos[i].y = snakePos[i - 1].y
-            }
+            newPoint.x = snakePos[0].x
+            newPoint.y = snakePos[0].y
             when (direction) {
-                MoveDirection.UP -> snakePos[0].y -= 1
-                MoveDirection.DOWN -> snakePos[0].y += 1
-                MoveDirection.LEFT -> snakePos[0].x -= 1
-                MoveDirection.RIGHT -> snakePos[0].x += 1
+                MoveDirection.UP -> newPoint.y -= 1
+                MoveDirection.DOWN -> newPoint.y += 1
+                MoveDirection.LEFT -> newPoint.x -= 1
+                MoveDirection.RIGHT -> newPoint.x += 1
             }
-            if (snakePos[0].x > xMax || snakePos[0].x < 0 ||
-                snakePos[0].y > yMax || snakePos[0].y < 0
+
+            if (newPoint.x >= xMax || newPoint.x < 0 ||
+                newPoint.y >= yMax || newPoint.y < 0
             )
                 snakeBeginDie()
+            else {
+                for (i in snakePos.count() - 1 downTo 1) {
+                    snakePos[i].x = snakePos[i - 1].x
+                    snakePos[i].y = snakePos[i - 1].y
+                }
+                snakePos[0].x = newPoint.x
+                snakePos[0].y = newPoint.y
+            }
+
             if (snakePos[0] == applePoint) {
                 snakePos.add(lastPoint)
                 generateNewApple()
@@ -129,7 +138,6 @@ class SnakeLogic(
             }
             if (snakeHandler != null)
                 snakeHandler!!.updateView()
-
         }
     }
 
@@ -155,6 +163,7 @@ class SnakeLogic(
     fun setMaxSize(xMax: Int, yMax: Int) {
         this.xMax = xMax
         this.yMax = yMax
+        Log.d("SNAKE", "Set size $xMax, $yMax")
         generateNewApple()
     }
 
