@@ -8,4 +8,10 @@
         <item name="android:background">@color/black_overlay</item>
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
+
+    <style name="menuText" parent="android:Widget.TextView" >
+        <item name="android:textColor">#00FF00</item>
+        <item name="android:background">#07000000</item>
+        <item name="android:textSize">@dimen/textSize</item>
+    </style>
 </resources>

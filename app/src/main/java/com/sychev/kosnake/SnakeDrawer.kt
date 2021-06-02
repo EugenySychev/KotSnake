@@ -10,7 +10,8 @@ import android.view.View
 import androidx.core.graphics.withTranslation
 import kotlin.math.roundToInt
 
-class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
+class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
+    SnakeLogic.EventHandler {
 
     private var onPause: Boolean = false
     private var menuPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -23,12 +24,13 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     var borderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var scorePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var cubeSize: Int = 0
-    private val maxCubeNumber = 20
     private var snake: SnakeLogic? = null;
-    private var thinkness: Float = 5F
+    private var maxCubeNumber: Int = 20
+    private var thinkness: Float = 0.0f
+    private val borderThinkness = 8f
     var xMax: Int = maxCubeNumber
     var yMax: Int = maxCubeNumber
-    private var bottomBarSize: Int = 0
+    private var topBarSize: Int = 0
     var snakeAlive: Boolean = true
     private var pauseRect: Rect = Rect()
 
@@ -42,18 +44,24 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     }
 
     init {
-        if (context != null) {
-            if (context.resources.displayMetrics.widthPixels > context.resources.displayMetrics.heightPixels) {
-                cubeSize = context.resources.displayMetrics.heightPixels / maxCubeNumber - 1
-                xMax = context.resources.displayMetrics.widthPixels / cubeSize
-            } else {
-                cubeSize = context.resources.displayMetrics.widthPixels / maxCubeNumber - 1
-                yMax = context.resources.displayMetrics.heightPixels / cubeSize
-            }
-//            thinkness = (cubeSize / 10).toFloat()
-            scorePaint.textSize = cubeSize.toFloat()
-            bottomBarSize = cubeSize * 3// I don't know why
-        }
+        maxCubeNumber = initialCubeNumber
+//        thinkness = 5f
+//        if (context != null) {
+//            topBarSize = context.resources.displayMetrics.heightPixels / 10
+//
+//            if (context.resources.displayMetrics.widthPixels > context.resources.displayMetrics.heightPixels) {
+//                cubeSize = context.resources.displayMetrics.heightPixels / maxCubeNumber - 1
+//                xMax = context.resources.displayMetrics.widthPixels / cubeSize
+//            } else {
+//                cubeSize = context.resources.displayMetrics.widthPixels / maxCubeNumber - 1
+//                yMax = context.resources.displayMetrics.heightPixels / cubeSize
+//            }
+////            thinkness = (cubeSize / 10).toFloat()
+////            scorePaint.textSize = (topBarSize / 3).toFloat()
+//        }
+        val w = context!!.resources.displayMetrics.widthPixels
+        val h = context.resources.displayMetrics.heightPixels
+        onSizeChanged(w, h, 0, 0)
         setupPainers()
 
         blinkHandler = Handler(Looper.myLooper()!!)
@@ -90,23 +98,28 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        thinkness = 5f
+
         xMax = maxCubeNumber;
         yMax = maxCubeNumber;
+        topBarSize = h / 10
+
         if (w > h) {
-            cubeSize = (((h - bottomBarSize - 3 * thinkness ) / maxCubeNumber) - 2 * thinkness).toInt()
+            cubeSize = (((h - topBarSize - 2 * borderThinkness) / maxCubeNumber) * 0.75).toInt()
+            thinkness = (cubeSize / 7).toFloat();
             xMax = (w - getBottomBarSize()) / (cubeSize)
         } else {
-            cubeSize = ((w - 3 * thinkness ) / maxCubeNumber - 2 * thinkness).toInt()
-            yMax = ((h - bottomBarSize - thinkness * 3 - getBottomBarSize()) / (cubeSize + thinkness) ).roundToInt()
+            cubeSize = ((w - 2 * borderThinkness) * 0.845 / maxCubeNumber).toInt()
+            thinkness = (cubeSize / 9).toFloat();
+            yMax = ((h - topBarSize - 2 * borderThinkness - thinkness) / (cubeSize + 2 * thinkness)).roundToInt()
         }
-        Log.d("Painter", "Set $xMax and $yMax cubesize if $cubeSize, h is $h $bottomBarSize")
+        Log.d("Painter", "Set $xMax and $yMax cubesize if $cubeSize, h is $h $topBarSize")
 //        thinkness = (cubeSize / 10).toFloat()
-        snake!!.setMaxSize(xMax, yMax)
+        if (snake != null)
+            snake?.setMaxSize(xMax, yMax)
         borderRect = Rect((thinkness / 2).toInt(),
-            (thinkness/ 2 + bottomBarSize).toInt(),
-            (w - thinkness/ 2).toInt(),
-            (h - thinkness  /2).toInt())
+            (thinkness / 2 + topBarSize).toInt(),
+            (w - thinkness / 2).toInt(),
+            (h - thinkness / 2).toInt())
         updatePainterWidth()
     }
 
@@ -153,13 +166,14 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     private fun drawScore(canvas: Canvas?) {
         val scoreText: String = snake?.score.toString()
         val scoreWidth = scorePaint.measureText(scoreText)
+        scorePaint.textSize = (topBarSize / 3).toFloat()
         canvas?.drawText(scoreText,
             (width - scoreWidth) / 2,
-            (cubeSize * 2).toFloat(),
+            (topBarSize / 3).toFloat(),
             scorePaint)
 
         canvas?.drawText("Pause", width - scorePaint.measureText("Pause Pause"),
-            (cubeSize * 2).toFloat(), scorePaint)
+            (topBarSize / 3).toFloat(), scorePaint)
         pauseRect.left = (width - scorePaint.measureText("Pause Pause")).toInt()
         pauseRect.right = width
         pauseRect.top = 0
@@ -167,26 +181,34 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     }
 
     private fun drawBorders(canvas: Canvas?) {
-        canvas?.drawRect(borderRect, borderPaint)//thinkness / 2,
-//            bottomBarSize.toFloat() + thinkness / 2,
-//            (xMax + 2) * (cubeSize + thinkness) + thinkness,
-//            (yMax + 2) * (cubeSize + thinkness) + thinkness + bottomBarSize,
-//            borderPaint)
+        canvas?.drawRect(thinkness / 2,
+            topBarSize.toFloat() + thinkness / 2,
+            xMax * (cubeSize + thinkness * 2) + thinkness,
+            yMax * (cubeSize + thinkness * 2) + topBarSize + thinkness,
+            borderPaint)
     }
 
     private fun drawMenu(canvas: Canvas?, pause: Boolean) {
 
-        menuPaint.textSize = (height / 10).toFloat()
+//        menuPaint.textSize = (height / 10).toFloat()
         val menuItems: List<String> =
             if (pause) arrayListOf("Continue", "Exit") else arrayListOf("Restart", "Exit")
         menuRects.clear()
+
+        val heightSplit = (height / 20).toFloat()
+        val vertBorder =
+            ((height - (menuItems.size - 1) * heightSplit) / (menuItems.size + 2)).toFloat()
+        menuPaint.textSize = vertBorder / 4
         for (i in 0 until menuItems.count()) {
-            var bound: Rect = Rect()
-            menuPaint.getTextBounds(menuItems[i], 0, menuItems[i].length, bound)
-            bound.offset(((width - menuPaint.measureText(menuItems[i])) / 2).toInt(),
-                i * height / 6 + height / 2)
-            menuRects.add(bound)
-            canvas?.drawText(menuItems[i], bound.left.toFloat(), bound.bottom.toFloat(), menuPaint)
+            val y = vertBorder * (i + 1.5f) + i * heightSplit
+            val rectangle: Rect = Rect(((width - menuPaint.measureText(menuItems[i])) / 2).toInt(),
+                (y - vertBorder).toInt(),
+                ((width + menuPaint.measureText(menuItems[i])) / 2).toInt(),
+                y.toInt())
+
+            menuRects.add(rectangle)
+            canvas?.drawText(menuItems[i], menuRects[i].left.toFloat(),
+                menuRects[i].top.toFloat() + vertBorder, menuPaint)
         }
 
     }
@@ -209,7 +231,7 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
     private fun drawCube(canvas: Canvas?, pos: Point, paint: Paint) {
         paint.style = Paint.Style.STROKE;
 
-        canvas?.withTranslation(thinkness * 2, thinkness * 2 + bottomBarSize) {
+        canvas?.withTranslation(thinkness * 2, thinkness * 2 + topBarSize) {
 
             canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness / 2),
                 (pos.y * (cubeSize + thinkness * 2) + thinkness / 2),
@@ -218,7 +240,7 @@ class SnakeDrawer(context: Context?) : View(context), SnakeLogic.EventHandler {
                 paint)
             paint.style = Paint.Style.FILL
             canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness * 5 / 2),
-                (pos.y * (cubeSize + thinkness * 2) + thinkness * 5 / 2 ),
+                (pos.y * (cubeSize + thinkness * 2) + thinkness * 5 / 2),
                 ((pos.x + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
                 ((pos.y + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
                 paint)

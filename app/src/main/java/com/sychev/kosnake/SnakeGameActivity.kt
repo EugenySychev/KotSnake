@@ -13,7 +13,10 @@ class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler {
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        view = SnakeDrawer(this)
+        val settingRef = baseContext.getSharedPreferences("Snake", MODE_PRIVATE)
+        val initialCubeNumber = settingRef.getInt("NumberOfCube", 30)
+
+        view = SnakeDrawer(this, initialCubeNumber)
         setContentView(view)
 
         snakeLogic = SnakeLogic(view.xMax, view.yMax, 7)
