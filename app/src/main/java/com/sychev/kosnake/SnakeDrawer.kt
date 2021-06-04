@@ -108,8 +108,8 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
             thinkness = (cubeSize / 7).toFloat();
             xMax = (w - getBottomBarSize()) / (cubeSize)
         } else {
-            cubeSize = ((w - 2 * borderThinkness) * 0.845 / maxCubeNumber).toInt()
-            thinkness = (cubeSize / 9).toFloat();
+            cubeSize = ((w - 2 * borderThinkness) * 8 / 10 / maxCubeNumber).toInt()
+            thinkness = (cubeSize / 8).toFloat();
             yMax = ((h - topBarSize - 2 * borderThinkness - thinkness) / (cubeSize + 2 * thinkness)).roundToInt()
         }
         Log.d("Painter", "Set $xMax and $yMax cubesize if $cubeSize, h is $h $topBarSize")
@@ -124,7 +124,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     }
 
     private fun updatePainterWidth() {
-        borderPaint.strokeWidth = thinkness
+        borderPaint.strokeWidth = borderThinkness
         applePaint.strokeWidth = thinkness
         snakePaint.strokeWidth = thinkness
     }
@@ -137,6 +137,8 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
+        val xpos_dev = width - (xMax ) * (cubeSize + thinkness * 2) - borderThinkness * 2
+        canvas?.translate(xpos_dev / 2, 0f )
         drawBorders(canvas)
         drawScore(canvas)
 
@@ -181,10 +183,10 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     }
 
     private fun drawBorders(canvas: Canvas?) {
-        canvas?.drawRect(thinkness / 2,
-            topBarSize.toFloat() + thinkness / 2,
-            xMax * (cubeSize + thinkness * 2) + thinkness,
-            yMax * (cubeSize + thinkness * 2) + topBarSize + thinkness,
+        canvas?.drawRect(borderThinkness / 2,
+            topBarSize.toFloat() + borderThinkness / 2,
+            xMax * (cubeSize + thinkness * 2) + borderThinkness,
+            yMax * (cubeSize + thinkness * 2) + topBarSize + borderThinkness,
             borderPaint)
     }
 
@@ -231,7 +233,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     private fun drawCube(canvas: Canvas?, pos: Point, paint: Paint) {
         paint.style = Paint.Style.STROKE;
 
-        canvas?.withTranslation(thinkness * 2, thinkness * 2 + topBarSize) {
+        canvas?.withTranslation(borderThinkness , borderThinkness  + topBarSize) {
 
             canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness / 2),
                 (pos.y * (cubeSize + thinkness * 2) + thinkness / 2),
@@ -239,7 +241,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
                 ((pos.y + 1) * (cubeSize + thinkness * 2) - 2 * thinkness),
                 paint)
             paint.style = Paint.Style.FILL
-            canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness * 5 / 2),
+            canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness * 5/ 2),
                 (pos.y * (cubeSize + thinkness * 2) + thinkness * 5 / 2),
                 ((pos.x + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
                 ((pos.y + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
