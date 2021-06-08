@@ -23,7 +23,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     var snakePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var borderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var scorePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    var cubeSize: Int = 0
+    var cubeSize: Float = 0f
     private var snake: SnakeLogic? = null;
     private var maxCubeNumber: Int = 20
     private var thinkness: Float = 0.0f
@@ -33,11 +33,10 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     private var topBarSize: Int = 0
     var snakeAlive: Boolean = true
     private var pauseRect: Rect = Rect()
-
     private var borderRect: Rect = Rect()
-
     private var menuRects: MutableList<Rect> = mutableListOf()
     private var drawerHandler: DrawerHandler? = null
+    private var bottomSeek: Int = 0
 
     interface DrawerHandler {
         fun exitGame()
@@ -104,11 +103,11 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
         topBarSize = h / 10
 
         if (w > h) {
-            cubeSize = (((h - topBarSize - 2 * borderThinkness) / maxCubeNumber) * 0.75).toInt()
+            cubeSize = (((h - topBarSize - 2 * borderThinkness) / maxCubeNumber) * 0.75).toFloat()
             thinkness = (cubeSize / 7).toFloat();
-            xMax = (w - getBottomBarSize()) / (cubeSize)
+            xMax = ((w - getBottomBarSize()) / (cubeSize)).roundToInt()
         } else {
-            cubeSize = ((w - 2 * borderThinkness) * 8 / 10 / maxCubeNumber).toInt()
+            cubeSize = (w - 2 * borderThinkness) * 8 / 10 / maxCubeNumber
             thinkness = (cubeSize / 8).toFloat();
             yMax = ((h - topBarSize - 2 * borderThinkness - thinkness) / (cubeSize + 2 * thinkness)).roundToInt()
         }
@@ -120,6 +119,9 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
             (thinkness / 2 + topBarSize).toInt(),
             (w - thinkness / 2).toInt(),
             (h - thinkness / 2).toInt())
+
+        bottomSeek = (h - yMax * (cubeSize + thinkness * 2) - topBarSize - borderThinkness).toInt()
+
         updatePainterWidth()
     }
 
@@ -138,7 +140,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
         super.onDraw(canvas)
 
         val xpos_dev = width - (xMax ) * (cubeSize + thinkness * 2) - borderThinkness * 2
-        canvas?.translate(xpos_dev / 2, 0f )
+        canvas?.translate(xpos_dev / 2, bottomSeek.toFloat() )
         drawBorders(canvas)
         drawScore(canvas)
 
@@ -179,7 +181,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
         pauseRect.left = (width - scorePaint.measureText("Pause Pause")).toInt()
         pauseRect.right = width
         pauseRect.top = 0
-        pauseRect.bottom = cubeSize * 3
+        pauseRect.bottom = (cubeSize * 3).toInt()
     }
 
     private fun drawBorders(canvas: Canvas?) {
