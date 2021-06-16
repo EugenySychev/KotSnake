@@ -12,6 +12,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatSeekBar
+import androidx.appcompat.widget.SwitchCompat
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -23,7 +24,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var seekBar: AppCompatSeekBar
     private lateinit var settingRef: SharedPreferences
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +54,7 @@ class SettingsActivity : AppCompatActivity() {
         seekBar.setProgress(initialCubeNumber - 15)
 
         val textBack: TextView = findViewById(R.id.backSign)
-        textBack.setOnTouchListener{ v, event ->
+        textBack.setOnTouchListener { v, event ->
             Log.d("SETTINGS", "$event")
             if (event.action == MotionEvent.ACTION_DOWN) {
                 finish()
@@ -62,8 +63,20 @@ class SettingsActivity : AppCompatActivity() {
                 false
             }
         }
+
+        val soundSwitcher = findViewById<SwitchCompat>(R.id.soundSwitcher)
+        soundSwitcher.isChecked = settingRef.getBoolean("SoundEnabled", true)
+        soundSwitcher.setOnCheckedChangeListener { buttonView, isChecked ->
+            run {
+                with(settingRef.edit()) {
+                    putBoolean("SoundEnabled", isChecked)
+                    apply()
+                }
+            }
+        }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setCubeNumberValue(value: Int) {
         with(settingRef.edit()) {
             putInt("NumberOfCube", value)

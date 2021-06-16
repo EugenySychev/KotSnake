@@ -42,7 +42,8 @@
             android:layout_width="match_parent"
             android:layout_marginVertical="@dimen/max_margins"
             android:layout_height="wrap_content"
-            android:text="@string/sound_title" />
+            android:text="@string/sound_title"
+            android:id="@+id/soundSwitcher"/>
 
         <TextView
             style="@style/menuText"

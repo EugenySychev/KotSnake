@@ -5,6 +5,7 @@ import java.lang.Exception
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
 class SnakeLogic(
@@ -25,7 +26,7 @@ class SnakeLogic(
         set(value) {
             field = value
         }
-
+    private lateinit var soundHandler: SoundHandler
     var score: Int = 0
 
     private var direction: MoveDirection = MoveDirection.UP
@@ -41,6 +42,13 @@ class SnakeLogic(
         fun snakeDie()
         fun updateView()
     }
+
+    interface SoundHandler {
+        fun onStepSound()
+        fun onEatSound()
+        fun onDieSound()
+    }
+
 
     init {
         if (xMax < length + 2) {
@@ -129,7 +137,11 @@ class SnakeLogic(
                 snakePos.add(lastPoint)
                 generateNewApple()
                 increaseScore()
+                soundHandler.onEatSound()
+            } else {
+                soundHandler.onStepSound()
             }
+
 
             for (i in 1 until snakePos.count()) {
                 if (snakePos[0] == snakePos[i]) {
@@ -146,11 +158,13 @@ class SnakeLogic(
         timePeriod = (timePeriod / 1.125f).toLong()
     }
 
-    private final fun snakeBeginDie() {
+    private fun snakeBeginDie() {
         snakeAlive = false
         if (snakeHandler != null)
             snakeHandler!!.snakeDie()
+        soundHandler.onDieSound()
     }
+
 
     fun getLength(): Int {
         return snakePos.count()
@@ -169,6 +183,10 @@ class SnakeLogic(
 
     fun setPause(b: Boolean) {
         onPause = b
+    }
+
+    fun setSoundHandler(handler: SoundHandler) {
+        soundHandler = handler
     }
 
 
