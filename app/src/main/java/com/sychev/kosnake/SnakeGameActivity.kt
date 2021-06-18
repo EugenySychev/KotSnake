@@ -5,6 +5,7 @@ import android.app.Activity
 import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
 
 class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler, SnakeLogic.SoundHandler {
 
@@ -14,12 +15,15 @@ class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler, SnakeL
     private lateinit var eatPlayer: MediaPlayer
     private lateinit var gameOverPlayer: MediaPlayer
     private var soundEnabled = false
+    private lateinit var settingRef: SharedPreferences
+
 
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val settingRef = baseContext.getSharedPreferences("Snake", MODE_PRIVATE)
+        settingRef = baseContext.getSharedPreferences("Snake", MODE_PRIVATE)
         val initialCubeNumber = settingRef.getInt("NumberOfCube", 30)
+        var highScoreRecord = settingRef.getInt("HighScore", 0)
         soundEnabled = settingRef.getBoolean("SoundEnabled", true)
         stepPlayer = MediaPlayer.create(this, R.raw.tick)
         eatPlayer = MediaPlayer.create(this, R.raw.bite)
@@ -35,6 +39,7 @@ class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler, SnakeL
         view.setSnake(snakeLogic)
         view.setDrawerHandler(this)
 
+        snakeLogic.setHighscore(highScoreRecord)
         snakeLogic.setSoundHandler(this)
 
         view.setOnTouchListener(object : OnSwipeTouchListener(this@SnakeGameActivity) {
@@ -100,6 +105,13 @@ class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler, SnakeL
             if (eatPlayer.isPlaying)
                 eatPlayer.stop()
             gameOverPlayer.start()
+        }
+    }
+
+    override fun newRecord(score: Int) {
+        with(settingRef.edit()) {
+            putInt("HighScore", score)
+            apply()
         }
     }
 }

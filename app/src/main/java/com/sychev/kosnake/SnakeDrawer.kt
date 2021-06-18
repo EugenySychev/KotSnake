@@ -40,24 +40,12 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
 
     interface DrawerHandler {
         fun exitGame()
+        fun newRecord(score: Int)
     }
 
     init {
         maxCubeNumber = initialCubeNumber
-//        thinkness = 5f
-//        if (context != null) {
-//            topBarSize = context.resources.displayMetrics.heightPixels / 10
-//
-//            if (context.resources.displayMetrics.widthPixels > context.resources.displayMetrics.heightPixels) {
-//                cubeSize = context.resources.displayMetrics.heightPixels / maxCubeNumber - 1
-//                xMax = context.resources.displayMetrics.widthPixels / cubeSize
-//            } else {
-//                cubeSize = context.resources.displayMetrics.widthPixels / maxCubeNumber - 1
-//                yMax = context.resources.displayMetrics.heightPixels / cubeSize
-//            }
-////            thinkness = (cubeSize / 10).toFloat()
-////            scorePaint.textSize = (topBarSize / 3).toFloat()
-//        }
+
         val w = context!!.resources.displayMetrics.widthPixels
         val h = context.resources.displayMetrics.heightPixels
         onSizeChanged(w, h, 0, 0)
@@ -75,6 +63,10 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
                 snakeBlinker?.let { blinkHandler?.postDelayed(it, 500) }
             }
         }
+    }
+
+    override fun newRecord(score: Int) {
+        drawerHandler!!.newRecord(score)
     }
 
     private fun setupPainers() {
@@ -109,7 +101,8 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
         } else {
             cubeSize = (w - 2 * borderThinkness) * 8 / 10 / maxCubeNumber
             thinkness = (cubeSize / 8).toFloat();
-            yMax = ((h - topBarSize - 2 * borderThinkness - thinkness) / (cubeSize + 2 * thinkness)).roundToInt()
+            yMax =
+                ((h - topBarSize - 2 * borderThinkness - thinkness) / (cubeSize + 2 * thinkness)).roundToInt()
         }
         Log.d("Painter", "Set $xMax and $yMax cubesize if $cubeSize, h is $h $topBarSize")
 //        thinkness = (cubeSize / 10).toFloat()
@@ -139,8 +132,8 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        val xpos_dev = width - (xMax ) * (cubeSize + thinkness * 2) - borderThinkness * 2
-        canvas?.translate(xpos_dev / 2, bottomSeek.toFloat() )
+        val xpos_dev = width - (xMax) * (cubeSize + thinkness * 2) - borderThinkness * 2
+        canvas?.translate(xpos_dev / 2, bottomSeek.toFloat())
         drawBorders(canvas)
         drawScore(canvas)
 
@@ -195,8 +188,16 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     private fun drawMenu(canvas: Canvas?, pause: Boolean) {
 
 //        menuPaint.textSize = (height / 10).toFloat()
+        var lastRecord: Int = snake!!.getHighscore()
+        var currentScore: Int = snake!!.score
+        var scoreString: String = if (lastRecord < currentScore) "New record!!!\n" else ""
+        scoreString += "You score is " + snake?.score.toString() + "!"
+
+
         val menuItems: List<String> =
-            if (pause) arrayListOf("Continue", "Exit") else arrayListOf("Restart", "Exit")
+            if (pause) arrayListOf("Continue", "Exit") else arrayListOf(scoreString,
+                "Restart",
+                "Exit")
         menuRects.clear()
 
         val heightSplit = (height / 20).toFloat()
@@ -213,8 +214,8 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
             menuRects.add(rectangle)
             canvas?.drawText(menuItems[i], menuRects[i].left.toFloat(),
                 menuRects[i].top.toFloat() + vertBorder, menuPaint)
-        }
 
+        }
     }
 
     private fun drawSnake(canvas: Canvas?) {
@@ -235,15 +236,15 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     private fun drawCube(canvas: Canvas?, pos: Point, paint: Paint) {
         paint.style = Paint.Style.STROKE;
 
-        canvas?.withTranslation(borderThinkness , borderThinkness  + topBarSize) {
+        canvas?.withTranslation(borderThinkness, borderThinkness + topBarSize) {
 
-            canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness / 2),
+            canvas.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness / 2),
                 (pos.y * (cubeSize + thinkness * 2) + thinkness / 2),
                 ((pos.x + 1) * (cubeSize + thinkness * 2) - 2 * thinkness),
                 ((pos.y + 1) * (cubeSize + thinkness * 2) - 2 * thinkness),
                 paint)
             paint.style = Paint.Style.FILL
-            canvas?.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness * 5/ 2),
+            canvas.drawRect((pos.x * (cubeSize + thinkness * 2) + thinkness * 5 / 2),
                 (pos.y * (cubeSize + thinkness * 2) + thinkness * 5 / 2),
                 ((pos.x + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
                 ((pos.y + 1) * (cubeSize + thinkness * 2) - 4 * thinkness),
@@ -281,10 +282,10 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
             }
         } else {
             if (blinkComplete) {
-                if (menuRects[0].contains(x.toInt(), y.toInt())) {
+                if (menuRects[1].contains(x.toInt(), y.toInt())) {
                     snakeAlive = true
                     snake?.resetSnake()
-                } else if (menuRects[1].contains(x.toInt(), y.toInt())) {
+                } else if (menuRects[2].contains(x.toInt(), y.toInt())) {
                     drawerHandler?.exitGame()
                 }
             }

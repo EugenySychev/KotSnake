@@ -54,7 +54,7 @@ class SettingsActivity : AppCompatActivity() {
         seekBar.setProgress(initialCubeNumber - 15)
 
         val textBack: TextView = findViewById(R.id.backSign)
-        textBack.setOnTouchListener { v, event ->
+        textBack.setOnTouchListener { _, event ->
             Log.d("SETTINGS", "$event")
             if (event.action == MotionEvent.ACTION_DOWN) {
                 finish()
@@ -66,7 +66,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val soundSwitcher = findViewById<SwitchCompat>(R.id.soundSwitcher)
         soundSwitcher.isChecked = settingRef.getBoolean("SoundEnabled", true)
-        soundSwitcher.setOnCheckedChangeListener { buttonView, isChecked ->
+        soundSwitcher.setOnCheckedChangeListener { _, isChecked ->
             run {
                 with(settingRef.edit()) {
                     putBoolean("SoundEnabled", isChecked)

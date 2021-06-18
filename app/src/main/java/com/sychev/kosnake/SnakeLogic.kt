@@ -22,6 +22,7 @@ class SnakeLogic(
     private var handler: Handler? = null
     private var runnable: Runnable? = null
     private var onPause: Boolean = false
+    private var highscore: Int = 0
     var snakeHandler: EventHandler? = null
         set(value) {
             field = value
@@ -41,6 +42,7 @@ class SnakeLogic(
     interface EventHandler {
         fun snakeDie()
         fun updateView()
+        fun newRecord(score: Int)
     }
 
     interface SoundHandler {
@@ -76,6 +78,7 @@ class SnakeLogic(
         score = 0
         direction = MoveDirection.RIGHT
         snakeAlive = true
+        timePeriod = initialTimer
     }
 
     fun generateNewApple() {
@@ -160,9 +163,13 @@ class SnakeLogic(
 
     private fun snakeBeginDie() {
         snakeAlive = false
-        if (snakeHandler != null)
+        if (snakeHandler != null && soundHandler != null)
+        {
             snakeHandler!!.snakeDie()
-        soundHandler.onDieSound()
+            soundHandler!!.onDieSound()
+            if (score > highscore)
+                snakeHandler!!.newRecord(score)
+        }
     }
 
 
@@ -189,5 +196,11 @@ class SnakeLogic(
         soundHandler = handler
     }
 
+    fun setHighscore(highsc: Int) {
+        highscore = highsc
+    }
 
+    fun getHighscore(): Int {
+        return highscore
+    }
 }
