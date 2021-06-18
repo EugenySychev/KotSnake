@@ -1,16 +1,13 @@
 package com.sychev.kosnake
 
-import androidx.appcompat.app.AppCompatActivity
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.MotionEvent
-import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.widget.*
-import androidx.appcompat.widget.AppCompatEditText
+import android.widget.SeekBar
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.appcompat.widget.SwitchCompat
 
@@ -51,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
         val initialCubeNumber = settingRef.getInt("NumberOfCube", 30)
         numCubeDescr.text = resources.getText(R.string.num_of_cube_spinner)
             .toString() + initialCubeNumber.toString()
-        seekBar.setProgress(initialCubeNumber - 15)
+        seekBar.progress = initialCubeNumber - 15
 
         val textBack: TextView = findViewById(R.id.backSign)
         textBack.setOnTouchListener { _, event ->

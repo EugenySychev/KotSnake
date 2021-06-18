@@ -2,7 +2,6 @@ package com.sychev.kosnake
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -11,7 +10,7 @@ class FullscreenActivity : AppCompatActivity(), MenuDrawer.SelectedItem {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var menu = MenuDrawer(this)
+        val menu = MenuDrawer(this)
 
         val list = listOf("Play", "Settings", "Exit game")
         menu.setSelectedItemHandler(this)

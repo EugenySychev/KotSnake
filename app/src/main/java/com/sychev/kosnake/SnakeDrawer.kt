@@ -20,18 +20,18 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     private var currentBlink: Int = 0
     private var blinkComplete: Boolean = false
     private var applePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    var snakePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    var borderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    var scorePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    var cubeSize: Float = 0f
-    private var snake: SnakeLogic? = null;
+    private var snakePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var borderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var scorePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var cubeSize: Float = 0f
+    private var snake: SnakeLogic? = null
     private var maxCubeNumber: Int = 20
     private var thinkness: Float = 0.0f
     private val borderThinkness = 8f
     var xMax: Int = maxCubeNumber
     var yMax: Int = maxCubeNumber
     private var topBarSize: Int = 0
-    var snakeAlive: Boolean = true
+    private var snakeAlive: Boolean = true
     private var pauseRect: Rect = Rect()
     private var borderRect: Rect = Rect()
     private var menuRects: MutableList<Rect> = mutableListOf()
@@ -90,17 +90,17 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
-        xMax = maxCubeNumber;
-        yMax = maxCubeNumber;
+        xMax = maxCubeNumber
+        yMax = maxCubeNumber
         topBarSize = h / 10
 
         if (w > h) {
             cubeSize = (((h - topBarSize - 2 * borderThinkness) / maxCubeNumber) * 0.75).toFloat()
-            thinkness = (cubeSize / 7).toFloat();
+            thinkness = (cubeSize / 7)
             xMax = ((w - getBottomBarSize()) / (cubeSize)).roundToInt()
         } else {
             cubeSize = (w - 2 * borderThinkness) * 8 / 10 / maxCubeNumber
-            thinkness = (cubeSize / 8).toFloat();
+            thinkness = (cubeSize / 8)
             yMax =
                 ((h - topBarSize - 2 * borderThinkness - thinkness) / (cubeSize + 2 * thinkness)).roundToInt()
         }
@@ -132,8 +132,8 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        val xpos_dev = width - (xMax) * (cubeSize + thinkness * 2) - borderThinkness * 2
-        canvas?.translate(xpos_dev / 2, bottomSeek.toFloat())
+        val xposDev = width - (xMax) * (cubeSize + thinkness * 2) - borderThinkness * 2
+        canvas?.translate(xposDev / 2, bottomSeek.toFloat())
         drawBorders(canvas)
         drawScore(canvas)
 
@@ -188,8 +188,8 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     private fun drawMenu(canvas: Canvas?, pause: Boolean) {
 
 //        menuPaint.textSize = (height / 10).toFloat()
-        var lastRecord: Int = snake!!.getHighscore()
-        var currentScore: Int = snake!!.score
+        val lastRecord: Int = snake!!.getHighscore()
+        val currentScore: Int = snake!!.score
         var scoreString: String = if (lastRecord < currentScore) "New record!!!\n" else ""
         scoreString += "You score is " + snake?.score.toString() + "!"
 
@@ -202,11 +202,11 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
 
         val heightSplit = (height / 20).toFloat()
         val vertBorder =
-            ((height - (menuItems.size - 1) * heightSplit) / (menuItems.size + 2)).toFloat()
+            ((height - (menuItems.size - 1) * heightSplit) / (menuItems.size + 2))
         menuPaint.textSize = vertBorder / 4
         for (i in 0 until menuItems.count()) {
             val y = vertBorder * (i + 1.5f) + i * heightSplit
-            val rectangle: Rect = Rect(((width - menuPaint.measureText(menuItems[i])) / 2).toInt(),
+            val rectangle = Rect(((width - menuPaint.measureText(menuItems[i])) / 2).toInt(),
                 (y - vertBorder).toInt(),
                 ((width + menuPaint.measureText(menuItems[i])) / 2).toInt(),
                 y.toInt())
@@ -222,7 +222,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
         for (i in 0 until snake!!.getLength()) {
             drawSnakeCube(canvas, snake!!.getSnakePos(i))
         }
-        drawAppleCube(canvas, snake!!.getApplePoint());
+        drawAppleCube(canvas, snake!!.getApplePoint())
     }
 
     private fun drawAppleCube(canvas: Canvas?, applePoint: Point) {
@@ -234,7 +234,7 @@ class SnakeDrawer(context: Context?, initialCubeNumber: Int) : View(context),
     }
 
     private fun drawCube(canvas: Canvas?, pos: Point, paint: Paint) {
-        paint.style = Paint.Style.STROKE;
+        paint.style = Paint.Style.STROKE
 
         canvas?.withTranslation(borderThinkness, borderThinkness + topBarSize) {
 

@@ -12,13 +12,13 @@ import android.view.View
 
 class MenuDrawer(context: Context) : View(context), View.OnTouchListener {
 
-    var fontPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    var fontSize: Int = 100
-    var selectionHandler: SelectedItem? = null
-    var itemList: List<String> = arrayListOf()
-    var vertBorder: Float = 0f
-    var heightSplit: Float = 0f
-    var rectList: MutableList<Rect> = mutableListOf()
+    private var fontPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var fontSize: Int = 100
+    private var selectionHandler: SelectedItem? = null
+    private var itemList: List<String> = arrayListOf()
+    private var vertBorder: Float = 0f
+    private var heightSplit: Float = 0f
+    private var rectList: MutableList<Rect> = mutableListOf()
 
     interface SelectedItem {
         fun onSelectedItem(item: Int)
@@ -50,11 +50,11 @@ class MenuDrawer(context: Context) : View(context), View.OnTouchListener {
         val w = context.resources.displayMetrics.widthPixels
         val count = itemList.count()
         heightSplit = (h / 20).toFloat()
-        vertBorder = ((h - (count - 1) * heightSplit) / (count + 2)).toFloat()
+        vertBorder = ((h - (count - 1) * heightSplit) / (count + 2))
         fontPaint.textSize = vertBorder / 3
         for (i in 0 until itemList.count()) {
             val y = vertBorder * (i + 1.5f) + i * heightSplit
-            val rectangle: Rect = Rect(((w - fontPaint.measureText(itemList[i])) / 2).toInt(),
+            val rectangle = Rect(((w - fontPaint.measureText(itemList[i])) / 2).toInt(),
                 (y - vertBorder).toInt(),
                 ((w + fontPaint.measureText(itemList[i])) / 2).toInt(),
                 y.toInt())

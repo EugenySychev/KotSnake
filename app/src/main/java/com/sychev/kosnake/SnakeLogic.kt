@@ -1,11 +1,9 @@
 package com.sychev.kosnake
 
 import android.graphics.Point
-import java.lang.Exception
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
 class SnakeLogic(
@@ -24,9 +22,6 @@ class SnakeLogic(
     private var onPause: Boolean = false
     private var highscore: Int = 0
     var snakeHandler: EventHandler? = null
-        set(value) {
-            field = value
-        }
     private lateinit var soundHandler: SoundHandler
     var score: Int = 0
 
@@ -81,7 +76,7 @@ class SnakeLogic(
         timePeriod = initialTimer
     }
 
-    fun generateNewApple() {
+    private fun generateNewApple() {
         applePoint = Point(Random.nextInt(xMax), Random.nextInt((yMax)))
 
         if (snakePos.count() > 0) {
@@ -111,7 +106,7 @@ class SnakeLogic(
 
         if (snakeAlive && !onPause) {
 
-            var newPoint: Point = Point()
+            val newPoint = Point()
             val lastPoint = Point(snakePos.last())
 
             newPoint.x = snakePos[0].x
@@ -163,10 +158,10 @@ class SnakeLogic(
 
     private fun snakeBeginDie() {
         snakeAlive = false
-        if (snakeHandler != null && soundHandler != null)
+        if (snakeHandler != null)
         {
-            snakeHandler!!.snakeDie()
-            soundHandler!!.onDieSound()
+            snakeHandler?.snakeDie()
+            soundHandler.onDieSound()
             if (score > highscore)
                 snakeHandler!!.newRecord(score)
         }

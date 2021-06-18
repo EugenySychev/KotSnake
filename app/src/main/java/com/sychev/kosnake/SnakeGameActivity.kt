@@ -1,11 +1,10 @@
 package com.sychev.kosnake
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import android.content.SharedPreferences
 
 class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler, SnakeLogic.SoundHandler {
 
@@ -17,13 +16,12 @@ class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler, SnakeL
     private var soundEnabled = false
     private lateinit var settingRef: SharedPreferences
 
-
     @SuppressLint("ClickableViewAccessibility")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingRef = baseContext.getSharedPreferences("Snake", MODE_PRIVATE)
         val initialCubeNumber = settingRef.getInt("NumberOfCube", 30)
-        var highScoreRecord = settingRef.getInt("HighScore", 0)
+        val highScoreRecord = settingRef.getInt("HighScore", 0)
         soundEnabled = settingRef.getBoolean("SoundEnabled", true)
         stepPlayer = MediaPlayer.create(this, R.raw.tick)
         eatPlayer = MediaPlayer.create(this, R.raw.bite)
@@ -75,7 +73,7 @@ class SnakeGameActivity : AppCompatActivity(), SnakeDrawer.DrawerHandler, SnakeL
 
     override fun onPause() {
         super.onPause()
-        view.setPauseState();
+        view.setPauseState()
     }
 
     override fun exitGame() {
