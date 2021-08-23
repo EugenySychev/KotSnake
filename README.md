@@ -1,5 +1,5 @@
 # KotSnake
-Kotlin Snake OpenGL game.
+Kotlin Snake game.
 
 [Markdown tutorial](https://guides.github.com/features/mastering-markdown/)
 
